@@ -1,6 +1,10 @@
 # expo
 .expo/
 
+# mac
+
+.DS_store
+
 # dependencies
 
 /node_modules
