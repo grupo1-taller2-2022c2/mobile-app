@@ -12,6 +12,7 @@ import {
 } from "react-native";
 
 export default function App() {
+  const [isSignedIn, setIsSignedIn] = useState(false) //FIXME: use it for protected routes
   return (
     <NavigationContainer>
       <NavigationStack/>
