@@ -11,27 +11,24 @@ import {
   Button,
 } from "react-native";
 
-const localhost = "http://localhost:3001";
+const localhost = "http://192.168.0.75:3001/token";
 
 function alertWrongCredentials() {
   Alert.alert("Wrong Credentials!");
 }
 
-function trySignIn(email, password) {
+async function trySignIn(email, password) {
   var result;
-  axios
-    .post(localhost + "/token", {
-      params: {
-        username: email,
-        password: password,
-      },
-    })
+  const qs = require('qs');
+  await axios
+    .post(localhost, qs.stringify({
+      username: email,
+      password: password
+      }))
     .then((response) => {
-      console.log(response);
       result = true;
     })
     .catch((error) => {
-      console.log(error);
       result = false;
     });
   return result;
