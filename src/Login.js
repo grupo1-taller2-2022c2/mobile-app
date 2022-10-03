@@ -18,7 +18,6 @@ function alertWrongCredentials() {
 }
 
 function trySignIn(email, password, setIsSignedIn) {
-  var result;
   const qs = require("qs");
   return axios
     .post(

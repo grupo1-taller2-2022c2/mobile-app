@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { styles } from "./Styles";
+import axios from "axios";
 
 import {
   Text,
@@ -13,11 +14,12 @@ import {
 function verify_password(password, pass_repeat) {
   return password === pass_repeat;
 }
-
+function alertWrongCredentials() {
+  Alert.alert("Wrong Credentials!");
+}
 const localhost = "http://192.168.100.13:3001/users/signup";
 
 function trySignUp(email, password, name, surname, setIsSignedUp) {
-  var result;
   return axios
     .post(localhost, {
       email: email,
@@ -27,10 +29,10 @@ function trySignUp(email, password, name, surname, setIsSignedUp) {
     })
     .then((response) => {
       result = response.status === 200 ?? false;
-      setIsSignedIn(result);
+      setIsSignedUp(result);
     })
     .catch((error) => {
-      setIsSignedIn(false);
+      setIsSignedUp(false);
     });
 }
 export default function Register(props) {
@@ -85,25 +87,18 @@ export default function Register(props) {
       />
       <TouchableOpacity
         style={[styles.button, { backgroundColor: "dodgerblue" }]}
-        onPress={() => {}}
+        onPress={() => {
+          trySignUp(email, password, name, surname, setIsSignedUp).then(() => {
+            if (isSignedUp) {
+              setIsSignedUp(false);
+              props.navigation.navigate("Login");
+            } else {
+              alertWrongCredentials();
+            }
+          });
+        }}
       >
-        <Text
-          style={styles.buttonText}
-          onPress={() => {
-            trySignUp(email, password, name, surname, setIsSignedUp).then(() => {
-              if (isSignedIn) {
-                setIsSignedUp(false);
-                props.navigation.navigate("Login", {
-                  setIsSignedUp: setIsSignedUp,
-                });
-              } else {
-                alertWrongCredentials();
-              }
-            });
-          }}
-        >
-          Sign up
-        </Text>
+        <Text style={styles.buttonText}>Sign up</Text>
       </TouchableOpacity>
     </View>
   );
