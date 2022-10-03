@@ -78,7 +78,7 @@ export default function Login(props) {
       </TouchableOpacity>
       <TouchableOpacity
         style={[styles.button, { backgroundColor: "dodgerblue" }]}
-        onPress={() => props.navigation.navigate("Register")}
+        onPress={() => {props.navigation.navigate("Register")}}
       >
         <Text style={styles.buttonText}>Sign up</Text>
       </TouchableOpacity>

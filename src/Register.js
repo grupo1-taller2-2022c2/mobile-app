@@ -15,7 +15,7 @@ function verify_password(password, pass_repeat) {
   return password === pass_repeat;
 }
 function alertWrongCredentials() {
-  Alert.alert("Wrong Credentials!");
+  Alert.alert("Please enter valid credentials!");
 }
 const localhost = "http://192.168.100.13:3001/users/signup";
 
@@ -35,7 +35,23 @@ function trySignUp(email, password, name, surname, setIsSignedUp) {
       setIsSignedUp(false);
     });
 }
+function handleChange(evt, setState) {
+  const value = evt.target.value;
+  setState({
+    ...state,
+    [evt.target.name]: value
+  });
+}
+
 export default function Register(props) {
+  const [state, setState] = useState({
+    email: "",
+    password: "",
+    pass_repeat: "",
+    name: "",
+    surname: "",
+    isSignedUp: false,
+  })
   const [email, onChangeEmail] = useState("");
   const [password, onChangePassword] = useState("");
   const [pass_repeat, onChangePassRepeat] = useState("");
@@ -91,6 +107,7 @@ export default function Register(props) {
           trySignUp(email, password, name, surname, setIsSignedUp).then(() => {
             if (isSignedUp) {
               setIsSignedUp(false);
+              Alert.alert("Succesfull Sign Up!")
               props.navigation.navigate("Login");
             } else {
               alertWrongCredentials();
