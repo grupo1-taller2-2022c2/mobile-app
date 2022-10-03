@@ -45,10 +45,11 @@ const LoginScreen = ({ navigation }) => {
   );
 };
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ route, navigation }) => {
+  const {setIsSignedIn} = route.params;
   return (
   <View style={styles.container}>
-    <Home/>
+    <Home setIsSignedIn={setIsSignedIn} navigation={navigation}/>
   </View>)
 };
 

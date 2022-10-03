@@ -19,19 +19,21 @@ function alertWrongCredentials() {
 
 function trySignIn(email, password, setIsSignedIn) {
   var result;
-  const qs = require('qs');
-  axios
-    .post(localhost, qs.stringify({
-      username: email,
-      password: password
-      }))
+  const qs = require("qs");
+  return axios
+    .post(
+      localhost,
+      qs.stringify({
+        username: email,
+        password: password,
+      })
+    )
     .then((response) => {
-      console.log(response)
       result = response.status === 200 ?? false;
-      setIsSignedIn(result)
+      setIsSignedIn(result);
     })
     .catch((error) => {
-      setIsSignedIn(false)
+      setIsSignedIn(false);
     });
 }
 
@@ -63,9 +65,14 @@ export default function Login(props) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          trySignIn(email, password, setIsSignedIn)
-          isSignedIn ? props.navigation.navigate("Home")
-          : alertWrongCredentials()
+          trySignIn(email, password, setIsSignedIn).then(() => {
+            if (isSignedIn) {
+              setIsSignedIn(false);
+              props.navigation.navigate("Home", {setIsSignedIn: setIsSignedIn});
+            } else {
+              alertWrongCredentials();
+            }
+          });
         }}
       >
         <Text style={styles.buttonText}>Sign in</Text>

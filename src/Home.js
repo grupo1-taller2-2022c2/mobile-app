@@ -9,10 +9,7 @@ import {
   Button,
 } from "react-native";
 
-export default function Home() {
-  var [Response, setResponse] = useState(null);
-  const baseUrl = 'https://mobile-fiuber.free.beeceptor.com/axios';
-
+export default function Home(props) {
   return (
     <View>
       <Text
@@ -20,11 +17,8 @@ export default function Home() {
       >
         You have succesfully logged in!
       </Text>
-      {Response === null ? <Text style={{ padding: 10, marginTop: 20, color: "#fff", marginBottom: 5 }}>Press the button!</Text> : <Text style={{ padding: 10, marginTop: 20, color: "#fff", marginBottom: 5 }}>Got response:{Response}</Text>}
-      <Button title="Send Request" onPress={() => {
-        axios.get(baseUrl).then((response) => {
-            setResponse(response.data)})
-      }}></Button>
+      <Button title='Logout' onPress={() => {props.setIsSignedIn(false)
+      props.navigation.navigate("Login")}}></Button>
       
     </View>
   );
