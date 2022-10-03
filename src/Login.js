@@ -11,7 +11,7 @@ import {
   Button,
 } from "react-native";
 
-const localhost = "http://192.168.100.13:3001/token";
+const localhost = "http://192.168.100.13:3005/token";
 
 function alertWrongCredentials() {
   Alert.alert("Wrong Credentials!");
@@ -28,7 +28,7 @@ function trySignIn(email, password, setIsSignedIn) {
       })
     )
     .then((response) => {
-      result = response.status === 200 ?? false;
+      result = response.status.toString()[0] === "2" ?? false;
       setIsSignedIn(result);
     })
     .catch((error) => {
@@ -67,7 +67,7 @@ export default function Login(props) {
           trySignIn(email, password, setIsSignedIn).then(() => {
             if (isSignedIn) {
               setIsSignedIn(false);
-              props.navigation.navigate("Home", {setIsSignedIn: setIsSignedIn});
+              props.navigation.navigate("Home", {setIsSignedIn: setIsSignedIn}); //FIXME this shouldnt be here
             } else {
               alertWrongCredentials();
             }

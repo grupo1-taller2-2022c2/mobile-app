@@ -17,7 +17,7 @@ function verify_password(password, pass_repeat) {
 function alertWrongCredentials() {
   Alert.alert("Please enter valid credentials!");
 }
-const localhost = "http://192.168.100.13:3001/users/signup";
+const localhost = "http://192.168.100.13:3005/users/signup";
 
 function trySignUp(email, password, name, surname, setIsSignedUp) {
   return axios
@@ -28,21 +28,13 @@ function trySignUp(email, password, name, surname, setIsSignedUp) {
       surname: surname,
     })
     .then((response) => {
-      result = response.status === 200 ?? false;
+      result = response.status.toString()[0] === "2" ?? false;
       setIsSignedUp(result);
     })
     .catch((error) => {
       setIsSignedUp(false);
     });
 }
-function handleChange(evt, setState) {
-  const value = evt.target.value;
-  setState({
-    ...state,
-    [evt.target.name]: value
-  });
-}
-
 export default function Register(props) {
   const [state, setState] = useState({
     email: "",
