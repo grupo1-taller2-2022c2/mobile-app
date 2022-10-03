@@ -11,33 +11,34 @@ import {
   Button,
 } from "react-native";
 
-const localhost = "http://192.168.0.75:3001/token";
+const localhost = "http://192.168.100.13:3001/token";
 
 function alertWrongCredentials() {
   Alert.alert("Wrong Credentials!");
 }
 
-async function trySignIn(email, password) {
+function trySignIn(email, password, setIsSignedIn) {
   var result;
   const qs = require('qs');
-  await axios
+  axios
     .post(localhost, qs.stringify({
       username: email,
       password: password
       }))
     .then((response) => {
-      result = true;
+      console.log(response)
+      result = response.status === 200 ?? false;
+      setIsSignedIn(result)
     })
     .catch((error) => {
-      result = false;
+      setIsSignedIn(false)
     });
-  return result;
 }
 
 export default function Login(props) {
   const [email, onChangeEmail] = useState(null);
   const [password, onChangePassword] = useState(null);
-
+  const [isSignedIn, setIsSignedIn] = useState(false);
   return (
     <View>
       <Text style={styles.title}>Welcome to FI-UBER</Text>
@@ -61,11 +62,11 @@ export default function Login(props) {
       />
       <TouchableOpacity
         style={styles.button}
-        onPress={() =>
-          trySignIn(email, password)
-            ? props.navigation.navigate("Home")
-            : alertWrongCredentials()
-        }
+        onPress={() => {
+          trySignIn(email, password, setIsSignedIn)
+          isSignedIn ? props.navigation.navigate("Home")
+          : alertWrongCredentials()
+        }}
       >
         <Text style={styles.buttonText}>Sign in</Text>
       </TouchableOpacity>
