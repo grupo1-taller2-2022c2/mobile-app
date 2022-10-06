@@ -13,3 +13,7 @@ Make sure you are using React version 14 or higher.
 To run this app simply run the following command:
 
 `npm start`
+
+If it doesnt work for any reason, try using a tunnel:
+`ngrok http 3000`
+`expo start --tunnel`
