@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { styles } from "./Styles";
 import axios from "axios";
+import qs from "qs";
 
 import {
   Text,
@@ -11,14 +12,14 @@ import {
   Button,
 } from "react-native";
 
-const localhost = "http://192.168.100.13:3005/token";
+const localhost = "http://192.168.0.75:3001/token";
+
 
 function alertWrongCredentials() {
   Alert.alert("Wrong Credentials!");
 }
 
-function trySignIn(email, password, setIsSignedIn) {
-  const qs = require("qs");
+function trySignIn(email, password) {
   return axios
     .post(
       localhost,
@@ -27,13 +28,6 @@ function trySignIn(email, password, setIsSignedIn) {
         password: password,
       })
     )
-    .then((response) => {
-      result = response.status.toString()[0] === "2" ?? false;
-      setIsSignedIn(result);
-    })
-    .catch((error) => {
-      setIsSignedIn(false);
-    });
 }
 
 export default function Login(props) {
@@ -64,14 +58,14 @@ export default function Login(props) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          trySignIn(email, password, setIsSignedIn).then(() => {
-            if (isSignedIn) {
-              setIsSignedIn(false);
-              props.navigation.navigate("Home", {setIsSignedIn: setIsSignedIn}); //FIXME this shouldnt be here
-            } else {
-              alertWrongCredentials();
-            }
-          });
+          trySignIn(email, password)
+              .then((response) => {
+                  setIsSignedIn(false);
+                  props.navigation.navigate("Home", {setIsSignedIn: setIsSignedIn}); //FIXME this shouldnt be here
+              })
+              .catch((e) => {
+                  alertWrongCredentials();
+              });
         }}
       >
         <Text style={styles.buttonText}>Sign in</Text>
