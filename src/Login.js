@@ -61,6 +61,8 @@ export default function Login(props) {
           trySignIn(email, password)
               .then((response) => {
                   setIsSignedIn(false);
+                  let token = response.data["access_token"];
+                  console.log(token);
                   props.navigation.navigate("Home", {setIsSignedIn: setIsSignedIn}); //FIXME this shouldnt be here
               })
               .catch((e) => {
