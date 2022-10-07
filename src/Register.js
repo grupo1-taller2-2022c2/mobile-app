@@ -17,7 +17,7 @@ function verify_password(password, pass_repeat) {
 function alertWrongCredentials() {
   Alert.alert("Please enter valid credentials!");
 }
-const localhost = "http://192.168.100.13:3005/users/signup";
+const localhost = "http://192.168.0.75:3001/users/signup";
 
 function trySignUp(email, password, name, surname, setIsSignedUp) {
   return axios
@@ -26,13 +26,6 @@ function trySignUp(email, password, name, surname, setIsSignedUp) {
       password: password,
       username: name,
       surname: surname,
-    })
-    .then((response) => {
-      result = response.status.toString()[0] === "2" ?? false;
-      setIsSignedUp(result);
-    })
-    .catch((error) => {
-      setIsSignedUp(false);
     });
 }
 export default function Register(props) {
@@ -96,14 +89,12 @@ export default function Register(props) {
       <TouchableOpacity
         style={[styles.button, { backgroundColor: "dodgerblue" }]}
         onPress={() => {
-          trySignUp(email, password, name, surname, setIsSignedUp).then(() => {
-            if (isSignedUp) {
+          trySignUp(email, password, name, surname).then(() => {
               setIsSignedUp(false);
-              Alert.alert("Succesfull Sign Up!")
+              Alert.alert("Successful Sign Up!");
               props.navigation.navigate("Login");
-            } else {
+          }).catch((e) => {
               alertWrongCredentials();
-            }
           });
         }}
       >
