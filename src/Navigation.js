@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
+import { userStatus, userStatusUpdate } from "./UserContext";
 
 import Home from "./Home";
 import Login from "./Login";
@@ -15,13 +16,11 @@ import Register from "./Register";
 import MyProfile from "./MyProfile";
 
 export function NavigationStack() {
+  const isSignedIn = userStatus();
   return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="Login"
-        component={Login}
-        options={{ headerShown: false }}
-      />
+  <Stack.Navigator>
+    {isSignedIn ? (
+      <>
       <Stack.Screen
         name="Home"
         component={Home}
@@ -32,14 +31,22 @@ export function NavigationStack() {
         component={MyProfile}
         options={{ headerShown: false }}
       />
-
-      <Stack.Screen
-        name="Register"
-        component={Register}
-        options={{ headerShown: false }}
-      />
-    </Stack.Navigator>
-  );
+      </>
+    ) : (
+      <>
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Register"
+          component={Register}
+          options={{ headerShown: false }}
+        />
+      </>
+    )}
+  </Stack.Navigator>);
 }
 
 const Stack = createNativeStackNavigator();

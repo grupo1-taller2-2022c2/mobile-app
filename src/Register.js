@@ -23,7 +23,7 @@ function alertWrongCredentials() {
   Alert.alert("Please enter valid credentials!");
 }
 
-function trySignUp(email, password, name, surname, setIsSignedUp) {
+function trySignUp(email, password, name, surname) {
   return axios
     .post(apiUrl, {
       email: email,
@@ -33,20 +33,11 @@ function trySignUp(email, password, name, surname, setIsSignedUp) {
     });
 }
 export default function Register(props) {
-  const [state, setState] = useState({
-    email: "",
-    password: "",
-    pass_repeat: "",
-    name: "",
-    surname: "",
-    isSignedUp: false,
-  })
   const [email, onChangeEmail] = useState("");
   const [password, onChangePassword] = useState("");
   const [pass_repeat, onChangePassRepeat] = useState("");
   const [name, onChangeName] = useState("");
   const [surname, onChangeSurname] = useState("");
-  const [isSignedUp, setIsSignedUp] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -94,9 +85,8 @@ export default function Register(props) {
         style={[styles.button, { backgroundColor: "dodgerblue" }]}
         onPress={() => {
           trySignUp(email, password, name, surname).then(() => {
-              setIsSignedUp(false);
-              Alert.alert("Successful Sign Up!");
-              props.navigation.navigate("Login");
+            Alert.alert("Successful Sign Up!");
+            props.navigation.navigate("Login");
           }).catch((e) => {
               alertWrongCredentials();
           });

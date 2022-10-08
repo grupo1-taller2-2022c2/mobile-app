@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
+import { userStatus, userStatusUpdate } from "./UserContext";
 
 const localhost = Constants.manifest.extra.localhost;
 const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + SIGNIN_EP;
@@ -35,6 +36,8 @@ function trySignIn(email, password) {
 export default function Login({navigation}) {
   const [email, onChangeEmail] = useState(null);
   const [password, onChangePassword] = useState(null);
+
+  const setSignInStatus = userStatusUpdate();
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to FI-UBER</Text>
@@ -61,11 +64,10 @@ export default function Login({navigation}) {
         onPress={() => {
           trySignIn(email, password)
               .then((response) => {
-                  setIsSignedIn(false);
                   let token = response.data["access_token"];
                   console.log(token);
-                  navigation.navigate("Home"); //FIXME this shouldnt be here
-              })
+                  setSignInStatus(true);
+                })
               .catch((e) => {
                   alertWrongCredentials();
               });

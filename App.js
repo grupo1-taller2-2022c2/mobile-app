@@ -9,11 +9,14 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
+import { UserStatusProvider } from "./src/UserContext";
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <NavigationStack />
-    </NavigationContainer>
+    <UserStatusProvider>
+      <NavigationContainer>
+        <NavigationStack />
+      </NavigationContainer>
+    </UserStatusProvider>
   );
 }

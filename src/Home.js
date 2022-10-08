@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 import {
   Text,
   View,
@@ -8,8 +8,11 @@ import {
   Button,
 } from "react-native";
 import { styles } from "./Styles";
+import { userStatus, userStatusUpdate } from "./UserContext";
+
 
 export default function Home() {
+  const setSignInStatus = userStatusUpdate();
   return (
     <View style={styles.container}>
       <Text
@@ -17,9 +20,12 @@ export default function Home() {
       >
         You have succesfully logged in!
       </Text>
-      <Button title='Logout'></Button>
-      
+      <Button
+        title="Logout"
+        onPress={() => {
+          setSignInStatus(false);
+        }}
+      ></Button>
     </View>
   );
 }
-
