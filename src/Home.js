@@ -10,8 +10,7 @@ import {
 import { styles } from "./Styles";
 import { userStatus, userStatusUpdate } from "./UserContext";
 
-
-export default function Home({navigation}) {
+export default function Home({ navigation }) {
   const setSignInStatus = userStatusUpdate();
   return (
     <View style={styles.container}>
@@ -20,19 +19,22 @@ export default function Home({navigation}) {
       >
         You have succesfully logged in!
       </Text>
-      <Button
-        title="Logout"
+      <TouchableOpacity
+        style={styles.button}
         onPress={() => {
           setSignInStatus(false);
         }}
-      ></Button>
-       <TouchableOpacity
+      >
+        <Text style={styles.buttonText}>Log out</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          navigation.navigate("MyProfile")
+          navigation.navigate("MyProfile");
         }}
       >
-        <Text style={styles.buttonText}>Profile Screen (dev)</Text>
+        <Text style={styles.buttonText}>Profile Screen</Text>
       </TouchableOpacity>
     </View>
   );

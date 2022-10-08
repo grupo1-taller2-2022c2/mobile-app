@@ -34,4 +34,10 @@ export const styles = StyleSheet.create({
   buttonText: {
     fontSize: 15,
   },
+  myProfile: {
+    flex: 1,
+    backgroundColor: "#000",
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
