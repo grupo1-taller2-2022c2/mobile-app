@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { styles } from "./Styles";
 import axios from "axios";
 import qs from "qs";
-
+import Constants from 'expo-constants';
 import {
   Text,
   View,
@@ -11,8 +11,8 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
-
-const localhost = "http://192.168.0.75:3001/token";
+const localhost = Constants.manifest.extra.localhost;
+const apiUrl = "http://" + localhost + ":3005/token";
 
 
 function alertWrongCredentials() {
@@ -22,7 +22,7 @@ function alertWrongCredentials() {
 function trySignIn(email, password) {
   return axios
     .post(
-      localhost,
+      apiUrl,
       qs.stringify({
         username: email,
         password: password,

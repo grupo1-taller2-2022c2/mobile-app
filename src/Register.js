@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { styles } from "./Styles";
 import axios from "axios";
+import Constants from 'expo-constants';
 
 import {
   Text,
@@ -11,17 +12,19 @@ import {
   Button,
 } from "react-native";
 
+const localhost = Constants.manifest.extra.localhost;
+const apiUrl = "http://"+localhost+":3005/users/signup";
+
 function verify_password(password, pass_repeat) {
   return password === pass_repeat;
 }
 function alertWrongCredentials() {
   Alert.alert("Please enter valid credentials!");
 }
-const localhost = "http://192.168.0.75:3001/users/signup";
 
 function trySignUp(email, password, name, surname, setIsSignedUp) {
   return axios
-    .post(localhost, {
+    .post(apiUrl, {
       email: email,
       password: password,
       username: name,
