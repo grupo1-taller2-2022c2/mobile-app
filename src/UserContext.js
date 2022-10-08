@@ -1,24 +1,41 @@
 import React, { useContext, useState } from "react";
 
-const UserContext = React.createContext();
-const UserUpdateContext = React.createContext();
-
+//user status tells if the user is logged in or not
+const UserStatusContext = React.createContext();
 export function userStatus() {
-  return useContext(UserContext);
+  return useContext(UserStatusContext);
 }
 
-export function userStatusUpdate(){
-    return useContext(UserUpdateContext);
+const UserTokenContext = React.createContext();
+export function userToken() {
+  return useContext(UserTokenContext);
 }
 
 export function UserStatusProvider({ children }) {
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [token, setToken] = useState("");
 
   return (
-    <UserContext.Provider value={isSignedIn}>
-      <UserUpdateContext.Provider value={setIsSignedIn}>
+    <UserStatusContext.Provider
+      value={{
+        value: isSignedIn,
+        set: function (value) {
+          setIsSignedIn(value);
+          return;
+        },
+      }}
+    >
+      <UserTokenContext.Provider
+        value={{
+          value: token,
+          set: function (value) {
+            setToken(value);
+            return;
+          },
+        }}
+      >
         {children}
-      </UserUpdateContext.Provider>
-    </UserContext.Provider>
+      </UserTokenContext.Provider>
+    </UserStatusContext.Provider>
   );
 }

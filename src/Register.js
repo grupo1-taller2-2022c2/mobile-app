@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { styles } from "./Styles";
 import axios from "axios";
-import Constants from 'expo-constants';
+import Constants from "expo-constants";
 
 import {
   Text,
@@ -24,13 +24,12 @@ function alertWrongCredentials() {
 }
 
 function trySignUp(email, password, name, surname) {
-  return axios
-    .post(apiUrl, {
-      email: email,
-      password: password,
-      username: name,
-      surname: surname,
-    });
+  return axios.post(apiUrl, {
+    email: email,
+    password: password,
+    username: name,
+    surname: surname,
+  });
 }
 export default function Register(props) {
   const [email, onChangeEmail] = useState("");
@@ -84,15 +83,30 @@ export default function Register(props) {
       <TouchableOpacity
         style={[styles.button, { backgroundColor: "dodgerblue" }]}
         onPress={() => {
-          trySignUp(email, password, name, surname).then(() => {
-            Alert.alert("Successful Sign Up!");
-            props.navigation.navigate("Login");
-          }).catch((e) => {
+          trySignUp(email, password, name, surname)
+            .then(() => {
+              Alert.alert("Successful Sign Up!");
+              props.navigation.navigate("Login");
+            })
+            .catch((e) => {
               alertWrongCredentials();
-          });
+            });
         }}
       >
         <Text style={styles.buttonText}>Sign up</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: "yellow" }]}
+        onPress={() => {
+          //FIXME: delete this
+          onChangeEmail("m@gmail.com");
+          onChangePassword("a");
+          onChangePassRepeat("a");
+          onChangeName("matias");
+          onChangeSurname("fusco");
+        }}
+      >
+        <Text style={styles.buttonText}>Fast Fill-in(dev)</Text>
       </TouchableOpacity>
     </View>
   );

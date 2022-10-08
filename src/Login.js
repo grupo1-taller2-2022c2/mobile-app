@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
-import { userStatus, userStatusUpdate } from "./UserContext";
+import { userStatus, userToken } from "./UserContext";
 
 const localhost = Constants.manifest.extra.localhost;
 const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + SIGNIN_EP;
@@ -35,7 +35,9 @@ export default function Login({ navigation }) {
   const [email, onChangeEmail] = useState(null);
   const [password, onChangePassword] = useState(null);
 
-  const setSignInStatus = userStatusUpdate();
+  const userIsSignedIn = userStatus();
+  const token = userToken();
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to FI-UBER</Text>
@@ -62,9 +64,9 @@ export default function Login({ navigation }) {
         onPress={() => {
           trySignIn(email, password)
             .then((response) => {
-              let token = response.data["access_token"];
-              console.log(token);
-              setSignInStatus(true);
+              let token_data = response.data["access_token"];
+              token.set(token_data);
+              userIsSignedIn.set(true);
             })
             .catch((e) => {
               alertWrongCredentials();
@@ -80,6 +82,16 @@ export default function Login({ navigation }) {
         }}
       >
         <Text style={styles.buttonText}>Sign up</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: "yellow" }]}
+        onPress={() => {
+          //FIXME: delete this
+          onChangeEmail("m@gmail.com");
+          onChangePassword("a");
+        }}
+      >
+        <Text style={styles.buttonText}>Fast Fill-in(dev)</Text>
       </TouchableOpacity>
     </View>
   );

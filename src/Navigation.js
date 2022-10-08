@@ -16,10 +16,10 @@ import Register from "./Register";
 import MyProfile from "./MyProfile";
 
 export function NavigationStack() {
-  const isSignedIn = userStatus();
+  const userIsSignedIn = userStatus();
   return (
   <Stack.Navigator>
-    {isSignedIn ? (
+    {userIsSignedIn.value ? (
       <>
       <Stack.Screen
         name="Home"

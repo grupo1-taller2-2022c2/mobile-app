@@ -8,10 +8,20 @@ import {
   Button,
 } from "react-native";
 import { styles } from "./Styles";
-import { userStatus, userStatusUpdate } from "./UserContext";
+import { userStatus } from "./UserContext";
+import Constants from "expo-constants";
+import { API_GATEWAY_PORT, ME_EP, PASSENGERS_EP } from "./Constants";
 
+const localhost = Constants.manifest.extra.localhost;
+const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + PASSENGERS_EP + ME_EP;
+
+function tryGetMyProfile(token) {
+  return axios.post(apiUrl, {
+    Authorization: token,
+  });
+}
 export default function Home({ navigation }) {
-  const setSignInStatus = userStatusUpdate();
+  const userIsSignedIn = userStatus();
   return (
     <View style={styles.container}>
       <Text
@@ -22,8 +32,7 @@ export default function Home({ navigation }) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          setSignInStatus(false);
-        }}
+          userIsSignedIn.set(false);        }}
       >
         <Text style={styles.buttonText}>Log out</Text>
       </TouchableOpacity>
