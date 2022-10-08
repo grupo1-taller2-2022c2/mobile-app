@@ -3,6 +3,7 @@ import { styles } from "./Styles";
 import axios from "axios";
 import qs from "qs";
 import Constants from 'expo-constants';
+import { API_GATEWAY_PORT, SIGNIN_EP } from "./Constants";
 import {
   Text,
   View,
@@ -12,7 +13,7 @@ import {
   Button,
 } from "react-native";
 const localhost = Constants.manifest.extra.localhost;
-const apiUrl = "http://" + localhost + ":3005/token";
+const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + SIGNIN_EP;
 
 
 function alertWrongCredentials() {

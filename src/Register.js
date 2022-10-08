@@ -11,9 +11,10 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
+import { API_GATEWAY_PORT, SIGNUP_EP } from "./Constants";
 
 const localhost = Constants.manifest.extra.localhost;
-const apiUrl = "http://"+localhost+":3005/users/signup";
+const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + SIGNUP_EP;
 
 function verify_password(password, pass_repeat) {
   return password === pass_repeat;
