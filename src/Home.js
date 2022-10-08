@@ -11,7 +11,7 @@ import { styles } from "./Styles";
 import { userStatus, userStatusUpdate } from "./UserContext";
 
 
-export default function Home() {
+export default function Home({navigation}) {
   const setSignInStatus = userStatusUpdate();
   return (
     <View style={styles.container}>
@@ -26,6 +26,14 @@ export default function Home() {
           setSignInStatus(false);
         }}
       ></Button>
+       <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          navigation.navigate("MyProfile")
+        }}
+      >
+        <Text style={styles.buttonText}>Profile Screen (dev)</Text>
+      </TouchableOpacity>
     </View>
   );
 }
