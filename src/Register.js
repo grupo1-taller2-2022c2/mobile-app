@@ -49,7 +49,7 @@ export default function Register(props) {
   const [isSignedUp, setIsSignedUp] = useState(false);
 
   return (
-    <View>
+    <View style={styles.container}>
       <Text style={[styles.title, { fontSize: 15 }]}>
         Please, enter an email address and a password
       </Text>

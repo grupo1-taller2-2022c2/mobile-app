@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
+
 const localhost = Constants.manifest.extra.localhost;
 const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + SIGNIN_EP;
 
@@ -31,12 +32,11 @@ function trySignIn(email, password) {
     )
 }
 
-export default function Login(props) {
+export default function Login({navigation}) {
   const [email, onChangeEmail] = useState(null);
   const [password, onChangePassword] = useState(null);
-  const [isSignedIn, setIsSignedIn] = useState(false);
   return (
-    <View>
+    <View style={styles.container}>
       <Text style={styles.title}>Welcome to FI-UBER</Text>
       <Text style={styles.text}>
         Please enter your email address and password
@@ -64,7 +64,7 @@ export default function Login(props) {
                   setIsSignedIn(false);
                   let token = response.data["access_token"];
                   console.log(token);
-                  props.navigation.navigate("Home", {setIsSignedIn: setIsSignedIn}); //FIXME this shouldnt be here
+                  navigation.navigate("Home"); //FIXME this shouldnt be here
               })
               .catch((e) => {
                   alertWrongCredentials();
@@ -75,9 +75,18 @@ export default function Login(props) {
       </TouchableOpacity>
       <TouchableOpacity
         style={[styles.button, { backgroundColor: "dodgerblue" }]}
-        onPress={() => {props.navigation.navigate("Register")}}
+        onPress={() => {navigation.navigate("Register")}}
       >
         <Text style={styles.buttonText}>Sign up</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          navigation.navigate("MyProfile")
+        }}
+      >
+        <Text style={styles.buttonText}>Profile Screen (dev)</Text>
       </TouchableOpacity>
     </View>
   );

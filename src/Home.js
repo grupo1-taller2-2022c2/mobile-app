@@ -1,5 +1,4 @@
 import axios from 'axios';
-import React, { useEffect, useState } from "react";
 import {
   Text,
   View,
@@ -8,17 +7,17 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
+import { styles } from "./Styles";
 
-export default function Home(props) {
+export default function Home() {
   return (
-    <View>
+    <View style={styles.container}>
       <Text
         style={{ padding: 10, marginTop: 20, color: "#fff", marginBottom: 5 }}
       >
         You have succesfully logged in!
       </Text>
-      <Button title='Logout' onPress={() => {props.setIsSignedIn(false)
-      props.navigation.navigate("Login")}}></Button>
+      <Button title='Logout'></Button>
       
     </View>
   );
