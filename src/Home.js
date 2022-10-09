@@ -8,7 +8,7 @@ import {
   Button,
 } from "react-native";
 import { styles } from "./Styles";
-import { userStatus } from "./UserContext";
+import { userStatus, userToken } from "./UserContext";
 import Constants from "expo-constants";
 import { API_GATEWAY_PORT, ME_EP, PASSENGERS_EP } from "./Constants";
 
@@ -22,6 +22,7 @@ function tryGetMyProfile(token) {
 }
 export default function Home({ navigation }) {
   const userIsSignedIn = userStatus();
+  const token = userToken();
   return (
     <View style={styles.container}>
       <Text
@@ -40,7 +41,7 @@ export default function Home({ navigation }) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          navigation.navigate("MyProfile");
+          navigation.navigate("MyProfile", {token: token.value});
         }}
       >
         <Text style={styles.buttonText}>Profile Screen</Text>

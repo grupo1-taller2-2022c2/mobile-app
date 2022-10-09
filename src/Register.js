@@ -22,6 +22,9 @@ function verify_password(password, pass_repeat) {
 function alertWrongCredentials() {
   Alert.alert("Please enter valid credentials!");
 }
+function alertUserAlreadyExists() {
+  Alert.alert("An existing account is using this email!");
+}
 
 function trySignUp(email, password, name, surname) {
   return axios.post(apiUrl, {
@@ -89,7 +92,13 @@ export default function Register(props) {
               props.navigation.navigate("Login");
             })
             .catch((e) => {
-              alertWrongCredentials();
+              if (e.response && e.response.status === 409) {
+                console.log(e.response.data.detail)
+                alertUserAlreadyExists();
+              }
+              else{
+                alertWrongCredentials();
+              }
             });
         }}
       >
