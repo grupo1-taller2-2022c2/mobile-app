@@ -1,6 +1,9 @@
 # expo
 .expo/
 
+#
+.idea
+
 # mac
 
 .DS_store
