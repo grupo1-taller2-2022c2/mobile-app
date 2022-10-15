@@ -14,6 +14,7 @@ import Home from "./Screens/Home";
 import Login from "./Screens/Login";
 import Register from "./Screens/Register";
 import MyProfile from "./Screens/MyProfile";
+import Map from "./Screens/Map";
 
 export function NavigationStack() {
   const userIsSignedIn = userStatus();
@@ -29,6 +30,11 @@ export function NavigationStack() {
       <Stack.Screen
         name="MyProfile"
         component={MyProfile}
+        options={{ headerShown: false }}
+      />
+       <Stack.Screen
+        name="Map"
+        component={Map}
         options={{ headerShown: false }}
       />
       </>
