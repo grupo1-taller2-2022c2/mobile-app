@@ -10,10 +10,10 @@ import {
 } from "react-native";
 import { userStatus, userStatusUpdate } from "./UserContext";
 
-import Home from "./Home";
-import Login from "./Login";
-import Register from "./Register";
-import MyProfile from "./MyProfile";
+import Home from "./Screens/Home";
+import Login from "./Screens/Login";
+import Register from "./Screens/Register";
+import MyProfile from "./Screens/MyProfile";
 
 export function NavigationStack() {
   const userIsSignedIn = userStatus();

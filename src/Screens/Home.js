@@ -7,10 +7,11 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
-import { styles } from "./Styles";
-import { userStatus, userToken } from "./UserContext";
+import { styles } from "../Styles";
+import { userStatus, userToken } from "../UserContext";
+import { API_GATEWAY_PORT, ME_EP, PASSENGERS_EP } from "../Constants";
 import Constants from "expo-constants";
-import { API_GATEWAY_PORT, ME_EP, PASSENGERS_EP } from "./Constants";
+
 
 const localhost = Constants.manifest.extra.localhost;
 const apiUrl =

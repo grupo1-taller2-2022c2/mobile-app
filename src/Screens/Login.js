@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { styles } from "./Styles";
+import { styles } from "../Styles";
 import axios from "axios";
 import qs from "qs";
 import Constants from "expo-constants";
-import { API_GATEWAY_PORT, SIGNIN_EP } from "./Constants";
+import { API_GATEWAY_PORT, SIGNIN_EP } from "../Constants";
 import {
   Text,
   View,
@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
-import { userStatus, userToken } from "./UserContext";
+import { userStatus, userToken } from "../UserContext";
 
 const localhost = Constants.manifest.extra.localhost;
 const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + SIGNIN_EP;
@@ -64,11 +64,13 @@ export default function Login({ navigation }) {
         onPress={() => {
           trySignIn(email, password)
             .then((response) => {
+              console.log("Got response at Sign In!")
               let token_data = response.data["access_token"];
               token.set(token_data);
               userIsSignedIn.set(true);
             })
             .catch((e) => {
+              console.log("Did not get response at Sign In")
               alertWrongCredentials();
             });
         }}
