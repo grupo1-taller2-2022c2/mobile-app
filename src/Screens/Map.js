@@ -13,10 +13,31 @@ import {
   Alert,
 } from "react-native";
 
+const mapRef = React.createRef();
+
+async function getCoordsFromAddress(address) {
+  let location;
+  try {
+    let result = await Location.geocodeAsync(address);
+    location = result[0];
+  } catch (error) {
+    Alert.alert("Error", "Could not find the address");
+    return null;
+  }
+  return location;
+  /*try {
+    let addresses =  await Location.reverseGeocodeAsync(coords[0])
+    Alert.alert("Got address: " + addresses[0].name);
+  }
+  catch(error){
+    Alert.alert("Error Catch", "E: " + error);
+  }*/
+}
+
 export default function Map({ navigation }) {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
-  const [destination, onChangeDestination] = useState(null);
+  const [destinationInput, onChangeDestinationInput] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -30,6 +51,7 @@ export default function Map({ navigation }) {
       setLocation(location);
     })();
   }, []);
+
   return errorMsg ? (
     <View style={map_styles.container}>
       <Text>{errorMsg}</Text>
@@ -39,22 +61,42 @@ export default function Map({ navigation }) {
     <View>
       <View style={{ margin: 50, marginBottom: 10 }}>
         <Text style={map_styles.title}>Please enter your destination</Text>
-        <View style={{flexDirection: 'row'}}>
+        <View style={{ flexDirection: "row" }}>
           <TextInput
             style={map_styles.input}
-            onChangeText={onChangeDestination}
-            value={destination}
+            onChangeText={onChangeDestinationInput}
+            value={destinationInput}
             placeholder="Destination..."
-            autoCapitalize="none"
+            //autoCapitalize="none"
           />
-          <TouchableOpacity style={map_styles.button} onPress={() => {
-            Alert.alert("Destination set to " + destination);
-          }}>
-          <Text style={map_styles.buttonText}>Go!</Text>
+          <TouchableOpacity
+            style={map_styles.button}
+            onPress={() => {
+              getCoordsFromAddress(destinationInput).then(
+                (input_coordinates) => {
+                  if (!input_coordinates) {
+                    Alert.alert("Error", "Invalid address");
+                    return;
+                  }
+                  mapRef.current.animateToRegion(
+                    {
+                      latitude: input_coordinates.latitude,
+                      longitude: input_coordinates.longitude,
+                      latitudeDelta: 0.01,
+                      longitudeDelta: 0.01,
+                    },
+                    1500
+                  );
+                }
+              );
+            }}
+          >
+            <Text style={map_styles.buttonText}>Go!</Text>
           </TouchableOpacity>
         </View>
       </View>
       <MapView
+        ref={mapRef}
         style={map_styles.map}
         initialRegion={{
           latitude: location.coords.latitude,
@@ -98,7 +140,6 @@ const map_styles = StyleSheet.create({
     alignItems: "center",
     margin: 12,
     marginLeft: 0,
-
   },
   buttonText: {
     fontSize: 15,
@@ -109,6 +150,6 @@ const map_styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "lightgray",
     borderRadius: 8,
-    flex:1,
+    flex: 1,
   },
 });
