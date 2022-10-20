@@ -58,6 +58,16 @@ export default function DriverHome({ navigation }) {
       >
         <Text style={styles.buttonText}>My Profile</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          navigation.navigate("Home");
+        }}
+      >
+        <Text style={styles.buttonText}>Switch to Passenger mode</Text>
+      </TouchableOpacity>
+
     </View>
   );
 }

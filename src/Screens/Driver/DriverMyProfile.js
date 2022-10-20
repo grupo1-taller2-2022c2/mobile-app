@@ -8,7 +8,7 @@ import {
     Image
   } from "react-native";
   import { styles } from "../../Styles";
-  import profilePicture from "../../assets/user-placeholder.png";
+  import profilePicture from "../../../assets/user-placeholder.png";
   export default function DriverMyProfile({route, navigation}) {
     const {data} = route.params;
     return (
