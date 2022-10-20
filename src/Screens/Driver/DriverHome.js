@@ -30,7 +30,7 @@ export default function DriverHome({ navigation }) {
       <Text
         style={{ padding: 10, marginTop: 20, color: "#fff", marginBottom: 5 }}
       >
-        You have succesfully logged as a Driver!
+        You have succesfully logged in as a Driver! {"\n"}
         We will let you know when a passenger requests a ride!
       </Text>
      

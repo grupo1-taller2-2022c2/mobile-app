@@ -78,6 +78,7 @@ export default function Home({ navigation }) {
           checkIfIAmDriver(token.value)
             .then((response) => {
               navigation.navigate("DriverHome");
+              //FIXME: let api know there is a new available driver
             })
             .catch((e) => {
               console.log(e);
