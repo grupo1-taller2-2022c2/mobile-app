@@ -59,7 +59,7 @@ export default function Map({ navigation }) {
       <Text>Give Location permissions to access map</Text>
     </View>
   ) : location ? (
-    <View>
+    <View style={map_styles.map_container}>
       <View style={{ margin: 50, marginBottom: 10 }}>
         <Text style={map_styles.title}>Please enter your destination</Text>
         <View style={{ flexDirection: "row" }}>
@@ -79,7 +79,6 @@ export default function Map({ navigation }) {
                     Alert.alert("Error", "Invalid address");
                     return;
                   }
-                  console.log("Destionation is: " + input_coordinates);
                   setDestinationMarkerCoords(input_coordinates);
                   mapRef.current.animateToRegion(
                     {
@@ -105,7 +104,7 @@ export default function Map({ navigation }) {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
           latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
+          longitudeDelta: 0.001,
         }}
         showsUserLocation={true}
       >
@@ -128,9 +127,15 @@ const map_styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  map_container: {
+    //flex: 1,
+    //backgroundColor: "#fff",
+    //alignItems: "center",
+    justifyContent: "flex-start",
+  },
   map: {
     width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
+    height: Dimensions.get("window").height * 0.75,
   },
   title: {
     color: "black",
