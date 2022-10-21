@@ -38,6 +38,7 @@ export default function Map({ navigation }) {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [destinationInput, onChangeDestinationInput] = useState(null);
+  const [destinationMarkerCoords, setDestinationMarkerCoords] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -78,6 +79,8 @@ export default function Map({ navigation }) {
                     Alert.alert("Error", "Invalid address");
                     return;
                   }
+                  console.log("Destionation is: " + input_coordinates);
+                  setDestinationMarkerCoords(input_coordinates);
                   mapRef.current.animateToRegion(
                     {
                       latitude: input_coordinates.latitude,
@@ -105,7 +108,11 @@ export default function Map({ navigation }) {
           longitudeDelta: 0.01,
         }}
         showsUserLocation={true}
-      />
+      >
+        {destinationMarkerCoords ? (
+          <MapView.Marker title="Destination" coordinate={destinationMarkerCoords}/>
+        ) : null}
+      </MapView>
     </View>
   ) : (
     <View style={map_styles.container}>
