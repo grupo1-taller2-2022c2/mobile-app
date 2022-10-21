@@ -11,6 +11,8 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  Modal,
+  Pressable
 } from "react-native";
 
 const mapRef = React.createRef();
@@ -39,6 +41,7 @@ export default function Map({ navigation }) {
   const [errorMsg, setErrorMsg] = useState(null);
   const [destinationInput, onChangeDestinationInput] = useState(null);
   const [destinationMarkerCoords, setDestinationMarkerCoords] = useState(null);
+  const [tripModalVisible, setTripModalVisible] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -87,13 +90,25 @@ export default function Map({ navigation }) {
                       latitudeDelta: 0.01,
                       longitudeDelta: 0.01,
                     },
-                    1500
+                    1200
                   );
+                  //FIXME: this could be made by waiting for the animation to finish
+                  setTimeout(() => {setTripModalVisible(true)}, 1700);
+                  
                 }
               );
             }}
           >
             <Text style={map_styles.buttonText}>Go!</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[map_styles.button, { backgroundColor: "yellow" }]} onPress={() => {
+            onChangeDestinationInput("Plaza de mayo")
+          }}>
+            <Text
+              style={map_styles.buttonText}
+            >
+              FF(dev)
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -109,9 +124,40 @@ export default function Map({ navigation }) {
         showsUserLocation={true}
       >
         {destinationMarkerCoords ? (
-          <MapView.Marker title="Destination" coordinate={destinationMarkerCoords}/>
+          <MapView.Marker
+            title="Destination"
+            coordinate={destinationMarkerCoords}
+          />
         ) : null}
       </MapView>
+      {tripModalVisible ? (
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={tripModalVisible}
+          onRequestClose={() => {
+            setTripModalVisible(!tripModalVisible);
+          }}
+        >
+          <View style={modal_styles.centeredView}>
+            <View style={modal_styles.modalView}>
+              <Text style={modal_styles.modalText}>Do you want to start a search for a driver to go to this destination?</Text>
+              <Pressable
+                style={[modal_styles.button, modal_styles.buttonClose]}
+                onPress={() => setTripModalVisible(!tripModalVisible)}
+              >
+                <Text style={modal_styles.textStyle}>Start the search!</Text>
+              </Pressable>
+              <Pressable
+                style={[modal_styles.button, modal_styles.buttonClose]}
+                onPress={() => setTripModalVisible(!tripModalVisible)}
+              >
+                <Text style={modal_styles.textStyle}>No, choose another destination</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+      ) : null}
     </View>
   ) : (
     <View style={map_styles.container}>
@@ -164,4 +210,56 @@ const map_styles = StyleSheet.create({
     borderRadius: 8,
     flex: 1,
   },
+});
+
+
+
+const modal_styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  button: {
+    justifyContent: "space-around",
+    backgroundColor: "lightskyblue",
+    padding: 10,
+    borderColor: "dodgerblue",
+    borderRadius: 8,
+    alignItems: "center",
+    margin: 12,
+    marginLeft: 0,
+  },
+  buttonOpen: {
+    backgroundColor: "#F194FF",
+  },
+  buttonClose: {
+    backgroundColor: "#2196F3",
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
+    fontSize: 20,
+  }
 });
