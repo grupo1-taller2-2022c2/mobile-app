@@ -3,7 +3,9 @@ import { useState, useEffect } from "react";
 import * as Location from "expo-location";
 import MapView from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
-import {GOOGLE_MAPS_APIKEY} from "../Constants";
+import { GOOGLE_MAPS_APIKEY } from "../Constants";
+import { mapContext, MapContextProvider } from "./MapContext";
+
 const { width, height } = Dimensions.get("window");
 
 const ASPECT_RATIO = width / height;
@@ -45,48 +47,26 @@ async function getCoordsFromAddress(address) {
   }*/
 }
 
+function SearchTab() {
+  const context = mapContext();
+  let { setTripModalVisible, onChangeDestinationInput, setDestinationCoords } =
+    context.setters;
+  let { destinationInput } = context.values;
 
-export default function Map({ navigation }) {
-  const [destinationInput, onChangeDestinationInput] = useState(null);
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
-  const [destinationCoords, setDestinationCoords] = useState(null);
-  const [tripModalVisible, setTripModalVisible] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-    })();
-  }, []);
-
-  return errorMsg ? (
-    <View style={map_styles.container}>
-      <Text>{errorMsg}</Text>
-      <Text>Give Location permissions to access map</Text>
-    </View>
-  ) : location ? (
-    <View style={map_styles.map_container}>
-      <View style={{ margin: 50, marginBottom: 10 }}>
-    <Text style={map_styles.title}>Please enter your destination</Text>
-    <View style={{ flexDirection: "row" }}>
-      <TextInput
-        style={map_styles.input}
-        onChangeText={onChangeDestinationInput}
-        value={destinationInput}
-        placeholder="Destination..."
-      />
-      <TouchableOpacity
-        style={map_styles.button}
-        onPress={() => {
-          getCoordsFromAddress(destinationInput).then(
-            (input_coordinates) => {
+  return (
+    <View style={{ margin: 50, marginBottom: 10 }}>
+      <Text style={map_styles.title}>Please enter your destination</Text>
+      <View style={{ flexDirection: "row" }}>
+        <TextInput
+          style={map_styles.input}
+          onChangeText={onChangeDestinationInput}
+          value={destinationInput}
+          placeholder="Destination..."
+        />
+        <TouchableOpacity
+          style={map_styles.button}
+          onPress={() => {
+            getCoordsFromAddress(destinationInput).then((input_coordinates) => {
               if (!input_coordinates) {
                 Alert.alert("Error", "Invalid address");
                 return;
@@ -106,22 +86,30 @@ export default function Map({ navigation }) {
               setTimeout(() => {
                 setTripModalVisible(true);
               }, PROMPT_WAIT_TIME);
-            }
-          );
-        }}
-      >
-        <Text style={map_styles.buttonText}>Go!</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[map_styles.button, { backgroundColor: "yellow" }]}
-        onPress={() => {
-          onChangeDestinationInput("Plaza de mayo");
-        }}
-      >
-        <Text style={map_styles.buttonText}>FF(dev)</Text>
-      </TouchableOpacity>
+            });
+          }}
+        >
+          <Text style={map_styles.buttonText}>Go!</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[map_styles.button, { backgroundColor: "yellow" }]}
+          onPress={() => {
+            onChangeDestinationInput("Plaza de mayo");
+          }}
+        >
+          <Text style={map_styles.buttonText}>FF(dev)</Text>
+        </TouchableOpacity>
+      </View>
     </View>
-  </View>
+  );
+}
+
+function MyMapView() {
+  const context = mapContext();
+  let { setTripModalVisible } = context.setters;
+  let { location, destinationCoords, tripModalVisible } = context.values;
+  return (
+    <>
       <MapView
         ref={mapRef}
         style={map_styles.map}
@@ -134,10 +122,7 @@ export default function Map({ navigation }) {
         showsUserLocation={true}
       >
         {destinationCoords ? (
-          <MapView.Marker
-            title="Destination"
-            coordinate={destinationCoords}
-          />
+          <MapView.Marker title="Destination" coordinate={destinationCoords} />
         ) : null}
         {destinationCoords ? (
           <MapViewDirections
@@ -182,12 +167,54 @@ export default function Map({ navigation }) {
           </View>
         </Modal>
       ) : null}
+    </>
+  );
+}
+
+function MyMapScreen() {
+  const context = mapContext();
+  console.log(context)
+  let { location } = context.values;
+  let { setLocation } = context.setters;
+  const [errorMsg, setErrorMsg] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    })();
+  }, []);
+
+
+  return errorMsg ? (
+    <View style={map_styles.container}>
+      <Text>{errorMsg}</Text>
+      <Text>Give Location permissions to access map</Text>
+    </View>
+  ) : location ? (
+    <View style={map_styles.map_container}>
+      <SearchTab />
+      <MyMapView />
     </View>
   ) : (
     <View style={map_styles.container}>
       <Text>Loading...</Text>
     </View>
   );
+}
+
+export default function Map(){
+  return (
+    <MapContextProvider>
+      <MyMapScreen />
+    </MapContextProvider>
+  )
 }
 
 const map_styles = StyleSheet.create({
