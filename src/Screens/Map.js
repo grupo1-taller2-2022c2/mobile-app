@@ -2,6 +2,15 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import * as Location from "expo-location";
 import MapView from "react-native-maps";
+import MapViewDirections from "react-native-maps-directions";
+import {GOOGLE_MAPS_APIKEY} from "../Constants";
+const { width, height } = Dimensions.get("window");
+
+const ASPECT_RATIO = width / height;
+const LATITUDE_DELTA = 0.02;
+const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+const ANIMATION_DURATION = 1200;
+const PROMPT_WAIT_TIME = 1700;
 
 import {
   StyleSheet,
@@ -12,7 +21,7 @@ import {
   TouchableOpacity,
   Alert,
   Modal,
-  Pressable
+  Pressable,
 } from "react-native";
 
 const mapRef = React.createRef();
@@ -36,11 +45,12 @@ async function getCoordsFromAddress(address) {
   }*/
 }
 
+
 export default function Map({ navigation }) {
+  const [destinationInput, onChangeDestinationInput] = useState(null);
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
-  const [destinationInput, onChangeDestinationInput] = useState(null);
-  const [destinationMarkerCoords, setDestinationMarkerCoords] = useState(null);
+  const [destinationCoords, setDestinationCoords] = useState(null);
   const [tripModalVisible, setTripModalVisible] = useState(false);
 
   useEffect(() => {
@@ -64,69 +74,78 @@ export default function Map({ navigation }) {
   ) : location ? (
     <View style={map_styles.map_container}>
       <View style={{ margin: 50, marginBottom: 10 }}>
-        <Text style={map_styles.title}>Please enter your destination</Text>
-        <View style={{ flexDirection: "row" }}>
-          <TextInput
-            style={map_styles.input}
-            onChangeText={onChangeDestinationInput}
-            value={destinationInput}
-            placeholder="Destination..."
-            //autoCapitalize="none"
-          />
-          <TouchableOpacity
-            style={map_styles.button}
-            onPress={() => {
-              getCoordsFromAddress(destinationInput).then(
-                (input_coordinates) => {
-                  if (!input_coordinates) {
-                    Alert.alert("Error", "Invalid address");
-                    return;
-                  }
-                  setDestinationMarkerCoords(input_coordinates);
-                  mapRef.current.animateToRegion(
-                    {
-                      latitude: input_coordinates.latitude,
-                      longitude: input_coordinates.longitude,
-                      latitudeDelta: 0.01,
-                      longitudeDelta: 0.01,
-                    },
-                    1200
-                  );
-                  //FIXME: this could be made by waiting for the animation to finish
-                  setTimeout(() => {setTripModalVisible(true)}, 1700);
-                  
-                }
+    <Text style={map_styles.title}>Please enter your destination</Text>
+    <View style={{ flexDirection: "row" }}>
+      <TextInput
+        style={map_styles.input}
+        onChangeText={onChangeDestinationInput}
+        value={destinationInput}
+        placeholder="Destination..."
+      />
+      <TouchableOpacity
+        style={map_styles.button}
+        onPress={() => {
+          getCoordsFromAddress(destinationInput).then(
+            (input_coordinates) => {
+              if (!input_coordinates) {
+                Alert.alert("Error", "Invalid address");
+                return;
+              }
+              setDestinationCoords(input_coordinates);
+              mapRef.current.animateToRegion(
+                {
+                  latitude: input_coordinates.latitude,
+                  longitude: input_coordinates.longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                },
+                ANIMATION_DURATION
               );
-            }}
-          >
-            <Text style={map_styles.buttonText}>Go!</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[map_styles.button, { backgroundColor: "yellow" }]} onPress={() => {
-            onChangeDestinationInput("Plaza de mayo")
-          }}>
-            <Text
-              style={map_styles.buttonText}
-            >
-              FF(dev)
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+              //Ask for estimated price to gateway
+              //FIXME: this could be made by waiting for the animation to finish
+              setTimeout(() => {
+                setTripModalVisible(true);
+              }, PROMPT_WAIT_TIME);
+            }
+          );
+        }}
+      >
+        <Text style={map_styles.buttonText}>Go!</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[map_styles.button, { backgroundColor: "yellow" }]}
+        onPress={() => {
+          onChangeDestinationInput("Plaza de mayo");
+        }}
+      >
+        <Text style={map_styles.buttonText}>FF(dev)</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
       <MapView
         ref={mapRef}
         style={map_styles.map}
         initialRegion={{
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.001,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
         }}
         showsUserLocation={true}
       >
-        {destinationMarkerCoords ? (
+        {destinationCoords ? (
           <MapView.Marker
             title="Destination"
-            coordinate={destinationMarkerCoords}
+            coordinate={destinationCoords}
+          />
+        ) : null}
+        {destinationCoords ? (
+          <MapViewDirections
+            origin={location.coords}
+            destination={destinationCoords}
+            apikey={GOOGLE_MAPS_APIKEY}
+            strokeWidth={6}
+            strokeColor="cornflowerblue"
           />
         ) : null}
       </MapView>
@@ -141,7 +160,10 @@ export default function Map({ navigation }) {
         >
           <View style={modal_styles.centeredView}>
             <View style={modal_styles.modalView}>
-              <Text style={modal_styles.modalText}>Do you want to start a search for a driver to go to this destination?</Text>
+              <Text style={modal_styles.modalText}>
+                Estimated Trip Price is $150. {"\n"}Do you want to start a
+                search for a driver to go to this destination?
+              </Text>
               <Pressable
                 style={[modal_styles.button, modal_styles.buttonClose]}
                 onPress={() => setTripModalVisible(!tripModalVisible)}
@@ -152,7 +174,9 @@ export default function Map({ navigation }) {
                 style={[modal_styles.button, modal_styles.buttonClose]}
                 onPress={() => setTripModalVisible(!tripModalVisible)}
               >
-                <Text style={modal_styles.textStyle}>No, choose another destination</Text>
+                <Text style={modal_styles.textStyle}>
+                  No, choose another destination
+                </Text>
               </Pressable>
             </View>
           </View>
@@ -174,18 +198,14 @@ const map_styles = StyleSheet.create({
     justifyContent: "center",
   },
   map_container: {
-    //flex: 1,
-    //backgroundColor: "#fff",
-    //alignItems: "center",
     justifyContent: "flex-start",
   },
   map: {
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height * 0.75,
+    width: width,
+    height: height * 0.75,
   },
   title: {
     color: "black",
-    //textAlign: "center",
     marginBottom: 10,
     fontSize: 25,
   },
@@ -212,14 +232,12 @@ const map_styles = StyleSheet.create({
   },
 });
 
-
-
 const modal_styles = StyleSheet.create({
   centeredView: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 22
+    marginTop: 22,
   },
   modalView: {
     margin: 20,
@@ -230,11 +248,11 @@ const modal_styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 2
+      height: 2,
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5
+    elevation: 5,
   },
   button: {
     justifyContent: "space-around",
@@ -255,11 +273,11 @@ const modal_styles = StyleSheet.create({
   textStyle: {
     color: "white",
     fontWeight: "bold",
-    textAlign: "center"
+    textAlign: "center",
   },
   modalText: {
     marginBottom: 15,
     textAlign: "center",
     fontSize: 20,
-  }
+  },
 });
