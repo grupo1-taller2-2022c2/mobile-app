@@ -46,7 +46,7 @@ export default function DriverHome({ navigation }) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          tryGetMyProfile(token.value)
+          tryGetMyProfile(token.value())
             .then((response) => {
               navigation.navigate("DriverMyProfile", { data: response.data });
             })
