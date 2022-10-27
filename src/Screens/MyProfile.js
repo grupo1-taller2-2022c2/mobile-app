@@ -7,8 +7,8 @@ import {
   Button,
   Image
 } from "react-native";
-import { styles } from "./Styles";
-import profilePicture from "../assets/user-placeholder.png";
+import { styles } from "../Styles";
+import profilePicture from "../../assets/user-placeholder.png";
 export default function MyProfile({route, navigation}) {
   const {data} = route.params;
   return (

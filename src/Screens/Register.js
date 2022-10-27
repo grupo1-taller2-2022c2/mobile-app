@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { styles } from "./Styles";
+import { styles } from "../Styles";
 import axios from "axios";
 import Constants from "expo-constants";
-
 import {
   Text,
   View,
@@ -11,7 +10,7 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
-import { API_GATEWAY_PORT, SIGNUP_EP } from "./Constants";
+import { API_GATEWAY_PORT, SIGNUP_EP } from "../Constants";
 
 const localhost = Constants.manifest.extra.localhost;
 const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + SIGNUP_EP;

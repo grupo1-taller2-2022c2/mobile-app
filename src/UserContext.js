@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import * as SecureStore from 'expo-secure-store';
 
 //user status tells if the user is logged in or not
 const UserStatusContext = React.createContext();
@@ -10,10 +11,17 @@ const UserTokenContext = React.createContext();
 export function userToken() {
   return useContext(UserTokenContext);
 }
-
+const TOKEN = "token";
 export function UserStatusProvider({ children }) {
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const [token, setToken] = useState("");
+
+  async function save(key, value) {
+    await SecureStore.setItemAsync(key, value);
+  }
+  
+  async function getValueFor(key) {
+    return await SecureStore.getItemAsync(key);
+  }
 
   return (
     <UserStatusContext.Provider
@@ -27,9 +35,12 @@ export function UserStatusProvider({ children }) {
     >
       <UserTokenContext.Provider
         value={{
-          value: token,
+          value: async function () {
+            return getValueFor(TOKEN)
+          },
           set: function (value) {
-            setToken(value);
+            console.log("Saving token: " + value)
+            save(TOKEN,value);
             return;
           },
         }}
