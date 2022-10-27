@@ -50,13 +50,12 @@ export default function Home({ navigation }) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          tryGetMyProfile(token.value)
+          tryGetMyProfile(token.value())
             .then((response) => {
               navigation.navigate("MyProfile", { data: response.data });
             })
             .catch((e) => {
               console.log(e);
-              console.log(apiUrl);
             });
         }}
       >
@@ -75,7 +74,7 @@ export default function Home({ navigation }) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          checkIfIAmDriver(token.value)
+          checkIfIAmDriver(token.value())
             .then((response) => {
               navigation.navigate("DriverHome");
               //FIXME: let api know there is a new available driver
