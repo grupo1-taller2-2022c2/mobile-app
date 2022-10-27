@@ -11,24 +11,16 @@ const UserTokenContext = React.createContext();
 export function userToken() {
   return useContext(UserTokenContext);
 }
-
+const TOKEN = "token";
 export function UserStatusProvider({ children }) {
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const [token, setToken] = useState("");
 
   async function save(key, value) {
     await SecureStore.setItemAsync(key, value);
   }
   
   async function getValueFor(key) {
-    let result = await SecureStore.getItemAsync(key);
-    if (result) {
-      console.log("returned value is " + result);
-      setToken(result)
-    } else {
-      console.log('No values stored under that key.');
-      return "";
-    }
+    return await SecureStore.getItemAsync(key);
   }
 
   return (
@@ -43,14 +35,12 @@ export function UserStatusProvider({ children }) {
     >
       <UserTokenContext.Provider
         value={{
-          value: function () {
-            getValueFor("token")
-            console.log("Using token: " + token)
-            return token
+          value: async function () {
+            return getValueFor(TOKEN)
           },
           set: function (value) {
             console.log("Saving token: " + value)
-            save("token",value);
+            save(TOKEN,value);
             return;
           },
         }}

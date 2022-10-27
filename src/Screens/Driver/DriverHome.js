@@ -13,8 +13,7 @@ import { API_GATEWAY_PORT, DRIVER_ME_EP } from "../../Constants";
 import Constants from "expo-constants";
 
 const localhost = Constants.manifest.extra.localhost;
-const apiUrl =
-  "http://" + localhost + ":" + API_GATEWAY_PORT + DRIVER_ME_EP;
+const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + DRIVER_ME_EP;
 
 function tryGetMyProfile(token) {
   return axios.get(apiUrl, {
@@ -33,7 +32,7 @@ export default function DriverHome({ navigation }) {
         You have succesfully logged in as a Driver! {"\n"}
         We will let you know when a passenger requests a ride!
       </Text>
-     
+
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
@@ -46,7 +45,16 @@ export default function DriverHome({ navigation }) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          tryGetMyProfile(token.value())
+          token
+            .value()
+            .catch((e) => {
+              console.log("Session Expired");
+              Alert.alert("Session Expired");
+              //FIXME: Add session expired code
+            })
+            .then((token) => {
+              return tryGetMyProfile(token);
+            })
             .then((response) => {
               navigation.navigate("DriverMyProfile", { data: response.data });
             })
@@ -67,7 +75,6 @@ export default function DriverHome({ navigation }) {
       >
         <Text style={styles.buttonText}>Switch to Passenger mode</Text>
       </TouchableOpacity>
-
     </View>
   );
 }

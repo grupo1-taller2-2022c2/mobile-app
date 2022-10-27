@@ -50,7 +50,16 @@ export default function Home({ navigation }) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          tryGetMyProfile(token.value())
+          token
+            .value()
+            .catch((e) => {
+              console.log("Session Expired");
+              Alert.alert("Session Expired");
+              //FIXME: Add session expired code
+            })
+            .then((token) => {
+              return tryGetMyProfile(token);
+            })
             .then((response) => {
               navigation.navigate("MyProfile", { data: response.data });
             })
@@ -74,7 +83,17 @@ export default function Home({ navigation }) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          checkIfIAmDriver(token.value())
+          token
+            .value()
+            .catch((e) => {
+              console.log("Session Expired");
+              Alert.alert("Session Expired");
+              //FIXME: Add session expired code
+            })
+            .then((token) => {
+              console.log("into then and token is " + token);
+              return checkIfIAmDriver(token);
+            })
             .then((response) => {
               navigation.navigate("DriverHome");
               //FIXME: let api know there is a new available driver
@@ -83,7 +102,6 @@ export default function Home({ navigation }) {
               console.log(e);
               Alert.alert("You are not registered as a driver!");
             });
-          
         }}
       >
         <Text style={styles.buttonText}>Switch to Driver mode</Text>

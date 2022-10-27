@@ -22,10 +22,14 @@ function alertWrongCredentials() {
 }
 
 function tryAddVehicle(licence_plate, model, token) {
-  return axios.post(apiUrl, {
-    licence_plate: licence_plate,
-    model: model,
-  }, {headers: { Authorization: "Bearer " + token }});
+  return axios.post(
+    apiUrl,
+    {
+      licence_plate: licence_plate,
+      model: model,
+    },
+    { headers: { Authorization: "Bearer " + token } }
+  );
 }
 export default function DriverRegister(props) {
   const [licence_plate, onChangeLicencePlate] = useState("");
@@ -54,7 +58,16 @@ export default function DriverRegister(props) {
       <TouchableOpacity
         style={[styles.button, { backgroundColor: "dodgerblue" }]}
         onPress={() => {
-          tryAddVehicle(licence_plate, model, token.value())
+          token
+            .value()
+            .catch((e) => {
+              console.log("Session Expired");
+              Alert.alert("Session Expired");
+              //FIXME: Add session expired code
+            })
+            .then((token) => {
+              tryAddVehicle(licence_plate, model, token);
+            })
             .then(() => {
               Alert.alert("Successfully added vehicle!");
               props.navigation.navigate("Home");
