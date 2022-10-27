@@ -8,7 +8,7 @@ import {
   Button,
 } from "react-native";
 import { styles } from "../../Styles";
-import { userStatus, userToken } from "../../UserContext";
+import { getUserStatus, getUserToken } from "../../UserContext";
 import { API_GATEWAY_PORT, DRIVER_ME_EP } from "../../Constants";
 import Constants from "expo-constants";
 
@@ -22,8 +22,8 @@ function tryGetMyProfile(token) {
 }
 
 export default function DriverHome({ navigation }) {
-  const userIsSignedIn = userStatus();
-  const token = userToken();
+  const userStatus = getUserStatus();
+  const token = getUserToken();
   return (
     <View style={styles.container}>
       <Text
@@ -36,7 +36,7 @@ export default function DriverHome({ navigation }) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          userIsSignedIn.set(false);
+          userStatus.signInState.signOut();
         }}
       >
         <Text style={styles.buttonText}>Log out</Text>
@@ -70,7 +70,7 @@ export default function DriverHome({ navigation }) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          navigation.navigate("Home");
+          userStatus.driverMode.exit()
         }}
       >
         <Text style={styles.buttonText}>Switch to Passenger mode</Text>

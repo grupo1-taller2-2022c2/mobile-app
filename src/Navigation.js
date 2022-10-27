@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
-import { userStatus, userStatusUpdate } from "./UserContext";
+import { getUserStatus, userStatusUpdate } from "./UserContext";
 
 import Home from "./Screens/Home";
 import Login from "./Screens/Login";
@@ -20,42 +20,47 @@ import DriverHome from "./Screens/Driver/DriverHome";
 import DriverMyProfile from "./Screens/Driver/DriverMyProfile";
 
 export function NavigationStack() {
-  const userIsSignedIn = userStatus();
+  const userStatus = getUserStatus();
   return (
     <Stack.Navigator>
-      {userIsSignedIn.value ? (
-        <>
-          <Stack.Screen
-            name="Home"
-            component={Home}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="MyProfile"
-            component={MyProfile}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Map"
-            component={Map}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="DriverRegistration"
-            component={DriverRegister}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="DriverHome"
-            component={DriverHome}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="DriverMyProfile"
-            component={DriverMyProfile}
-            options={{ headerShown: false }}
-          />
-        </>
+      {userStatus.signInState.value ? (
+        userStatus.driverMode.value ? (
+          <>
+            <Stack.Screen
+              name="DriverHome"
+              component={DriverHome}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="DriverMyProfile"
+              component={DriverMyProfile}
+              options={{ headerShown: false }}
+            />
+          </>
+        ) : (
+          <>
+            <Stack.Screen
+              name="Home"
+              component={Home}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="MyProfile"
+              component={MyProfile}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Map"
+              component={Map}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="DriverRegistration"
+              component={DriverRegister}
+              options={{ headerShown: false }}
+            />
+          </>
+        )
       ) : (
         <>
           <Stack.Screen

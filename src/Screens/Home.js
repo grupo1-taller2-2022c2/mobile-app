@@ -8,7 +8,7 @@ import {
   Button,
 } from "react-native";
 import { styles } from "../Styles";
-import { userStatus, userToken } from "../UserContext";
+import { getUserStatus, getUserToken } from "../UserContext";
 import { API_GATEWAY_PORT, DRIVER_ME_EP, ME_EP } from "../Constants";
 import Constants from "expo-constants";
 
@@ -29,8 +29,8 @@ function checkIfIAmDriver(token) {
 }
 
 export default function Home({ navigation }) {
-  const userIsSignedIn = userStatus();
-  const token = userToken();
+  const userStatus = getUserStatus();
+  const token = getUserToken();
   return (
     <View style={styles.container}>
       <Text
@@ -41,7 +41,7 @@ export default function Home({ navigation }) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          userIsSignedIn.set(false);
+          userStatus.signInState.signOut();
         }}
       >
         <Text style={styles.buttonText}>Log out</Text>
@@ -95,7 +95,7 @@ export default function Home({ navigation }) {
               return checkIfIAmDriver(token);
             })
             .then((response) => {
-              navigation.navigate("DriverHome");
+              userStatus.driverMode.enter()
               //FIXME: let api know there is a new available driver
             })
             .catch((e) => {

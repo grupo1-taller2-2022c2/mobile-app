@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { styles } from "../../Styles";
 import axios from "axios";
 import Constants from "expo-constants";
-import { userToken } from "../../UserContext";
+import { getUserToken } from "../../UserContext";
 
 import {
   Text,
@@ -34,7 +34,7 @@ function tryAddVehicle(licence_plate, model, token) {
 export default function DriverRegister(props) {
   const [licence_plate, onChangeLicencePlate] = useState("");
   const [model, onChangeModel] = useState("");
-  const token = userToken();
+  const token = getUserToken();
 
   return (
     <View style={styles.container}>
