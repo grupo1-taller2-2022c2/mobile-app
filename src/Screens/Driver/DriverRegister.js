@@ -54,7 +54,7 @@ export default function DriverRegister(props) {
       <TouchableOpacity
         style={[styles.button, { backgroundColor: "dodgerblue" }]}
         onPress={() => {
-          tryAddVehicle(licence_plate, model, token.value)
+          tryAddVehicle(licence_plate, model, token.value())
             .then(() => {
               Alert.alert("Successfully added vehicle!");
               props.navigation.navigate("Home");
