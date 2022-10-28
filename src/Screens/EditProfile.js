@@ -1,0 +1,132 @@
+import React, { useState } from "react";
+import { styles } from "../Styles";
+import axios from "axios";
+import Constants from "expo-constants";
+import * as ImagePicker from 'expo-image-picker';
+
+import {
+    Text,
+    View,
+    TextInput,
+    Alert,
+    TouchableOpacity,
+    Button, Image,
+} from "react-native";
+import {API_GATEWAY_PORT, EDIT_PROF_EP, SESSION_EXPIRED_MSG} from "../Constants";
+import {getUserStatus, getUserToken} from "../UserContext";
+import profilePicture from "../../assets/user-placeholder.png";
+
+const localhost = Constants.manifest.extra.localhost;
+const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + EDIT_PROF_EP;
+
+function tryEditProfile(name, surname, token) {
+    return axios.patch(apiUrl, {
+        username: name,
+        surname: surname,
+        ratings: 5
+    }, {
+        headers: { Authorization: "Bearer " + token },
+    });
+}
+
+function PickAnImage() {
+    const [image, setImage] = useState(null);
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+        if (!result.cancelled) {
+            setImage(result.uri);
+        }
+    };
+
+    return (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
+            {!image && <Image source={profilePicture} style={{height: 200, width:200, resizeMode: "contain"}}/>}
+            <br/>
+            <Button title="Pick an image" onPress={pickImage} />
+        </View>
+    );
+}
+
+export default function EditProfile({route, navigation}) {
+    console.log("Entered edit!");
+    const {data} = route.params;
+    const [name, onChangeName] = useState(data.username);
+    const [surname, onChangeSurname] = useState(data.surname);
+
+    const token = getUserToken();
+    const userStatus = getUserStatus();
+
+    return (
+        <View style={styles.container}>
+            <Text style={[styles.title, { fontSize: 15 }]}>
+                Please, enter your new profile information!
+            </Text>
+            <PickAnImage/>
+            <TextInput
+                style={styles.input}
+                onChangeText={onChangeName}
+                value={name}
+                placeholder="Enter New Name"
+                autoCapitalize="none"
+            />
+            <TextInput
+                style={styles.input}
+                onChangeText={onChangeSurname}
+                value={surname}
+                placeholder="Enter New Surname"
+                autoCapitalize="none"
+            />
+            <TouchableOpacity
+                style={[styles.button, { backgroundColor: "dodgerblue" }]}
+                onPress={() => {
+                    token
+                        .value()
+                        .catch((e) => {
+                            console.log("Token not found");
+                            Alert.alert("Something went wrong!");
+                            userStatus.signInState.signOut();
+                        })
+                        .then((token) => {
+                            return tryEditProfile(name, surname, token);
+                        })
+                        .then(() => {
+                            Alert.alert("Successful profile change!");
+                            data.username = name;
+                            data.surname = surname;
+                            navigation.navigate("MyProfile", {data: data});
+                        })
+                        .catch((e) => {
+                            console.log(e);
+                            //FIXME: is this truly the only error case?
+                            Alert.alert(SESSION_EXPIRED_MSG);
+                            userStatus.signInState.signOut();
+                        });
+                }}
+            >
+                <Text style={styles.buttonText}>Update Profile</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={[styles.button, { backgroundColor: "yellow" }]}
+                onPress={() => {
+                    //FIXME: delete this
+                    onChangeName("maticito");
+                    onChangeSurname("el crack");
+                }}
+            >
+                <Text style={styles.buttonText}>Fast Fill-in(dev)</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.button,{marginTop: 70}]} onPress={() => {
+                navigation.navigate("MyProfile", {data: data})
+            }} >
+                <Text style={{ color: "#fff", fontSize: 24 }}>Back</Text>
+            </TouchableOpacity>
+        </View>
+    );
+}

@@ -14,6 +14,7 @@ import Home from "./Screens/Home";
 import Login from "./Screens/Login";
 import Register from "./Screens/Register";
 import MyProfile from "./Screens/MyProfile";
+import EditProfile from "./Screens/EditProfile";
 import Map from "./Screens/Map";
 import DriverRegister from "./Screens/DriverRegister";
 import DriverHome from "./Screens/Driver/DriverHome";
@@ -48,6 +49,11 @@ export function NavigationStack() {
               name="MyProfile"
               component={MyProfile}
               options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="EditProfile"
+                component={EditProfile}
+                options={{ headerShown: false }}
             />
             <Stack.Screen
               name="Map"
