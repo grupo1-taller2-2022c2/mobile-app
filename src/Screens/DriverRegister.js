@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { styles } from "../../Styles";
+import { styles } from "../Styles";
 import axios from "axios";
 import Constants from "expo-constants";
-import { getUserToken } from "../../UserContext";
+import { getUserStatus, getUserToken } from "../UserContext";
 
 import {
   Text,
@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
-import { API_GATEWAY_PORT, ADD_VEHICLE_EP } from "../../Constants";
+import { API_GATEWAY_PORT, ADD_VEHICLE_EP } from "../Constants";
 
 const localhost = Constants.manifest.extra.localhost;
 const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + ADD_VEHICLE_EP;
@@ -35,6 +35,7 @@ export default function DriverRegister(props) {
   const [licence_plate, onChangeLicencePlate] = useState("");
   const [model, onChangeModel] = useState("");
   const token = getUserToken();
+  const userStatus = getUserStatus();
 
   return (
     <View style={styles.container}>
@@ -61,19 +62,22 @@ export default function DriverRegister(props) {
           token
             .value()
             .catch((e) => {
-              console.log("Session Expired");
-              Alert.alert("Session Expired");
-              //FIXME: Add session expired code
+              console.log("Token not found");
+              Alert.alert("Something went wrong!");
+              userStatus.signInState.signOut()
             })
             .then((token) => {
               tryAddVehicle(licence_plate, model, token);
             })
             .then(() => {
+              userStatus.registeredAsDriver.setIsRegistered();
               Alert.alert("Successfully added vehicle!");
               props.navigation.navigate("Home");
             })
             .catch((e) => {
+              const status_code = e.response.status;
               console.log(e);
+              //FIXME add more error handling
               alertWrongCredentials();
             });
         }}

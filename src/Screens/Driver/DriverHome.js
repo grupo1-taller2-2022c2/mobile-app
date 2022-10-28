@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { styles } from "../../Styles";
 import { getUserStatus, getUserToken } from "../../UserContext";
-import { API_GATEWAY_PORT, DRIVER_ME_EP } from "../../Constants";
+import { API_GATEWAY_PORT, DRIVER_ME_EP, HTTP_STATUS_UNATHORIZED,HTTP_STATUS_DOESNT_EXIST } from "../../Constants";
 import Constants from "expo-constants";
 
 const localhost = Constants.manifest.extra.localhost;
@@ -48,9 +48,9 @@ export default function DriverHome({ navigation }) {
           token
             .value()
             .catch((e) => {
-              console.log("Session Expired");
-              Alert.alert("Session Expired");
-              //FIXME: Add session expired code
+              console.log("Token not found");
+              Alert.alert("Something went wrong!");
+              userStatus.signInState.signOut();
             })
             .then((token) => {
               return tryGetMyProfile(token);
@@ -59,8 +59,18 @@ export default function DriverHome({ navigation }) {
               navigation.navigate("DriverMyProfile", { data: response.data });
             })
             .catch((e) => {
+              const status_code = e.response.status;
               console.log(e);
-              console.log(apiUrl);
+              if (status_code == HTTP_STATUS_DOESNT_EXIST) 
+              {Alert.alert("You are not registered as a driver");}
+              else if (status_code == HTTP_STATUS_UNATHORIZED)  {
+                Alert.alert("Session expired: Please sign in again");
+                userStatus.signInState.signOut();
+              }
+              else {
+                Alert.alert("Something went wrong!");
+                userStatus.signInState.signOut();
+              }
             });
         }}
       >

@@ -1,5 +1,6 @@
 import React, { useContext, useState } from "react";
 import * as SecureStore from "expo-secure-store";
+import { Alert } from "react-native";
 
 //user status tells if the user is logged in or not
 const UserStatusContext = React.createContext();
@@ -15,8 +16,13 @@ const TOKEN = "token";
 export function UserStatusProvider({ children }) {
   const [isSignedInState, setIsSignedInState] = useState(false);
   const [driverModeState, setDriverModeState] = useState(false);
+  const [registeredAsDriverState, setRegisteredAsDriverState] = useState(false);
 
-  async function save(key, value) {
+  async function deleteKey(key) {
+    await SecureStore.deleteItemAsync(key);
+  }
+  
+  async function saveKey(key, value) {
     await SecureStore.setItemAsync(key, value);
   }
 
@@ -24,6 +30,7 @@ export function UserStatusProvider({ children }) {
     return await SecureStore.getItemAsync(key);
   }
 
+  //FIXME: maybe delete alert when token cant be deleted
   return (
     <UserStatusContext.Provider
       value={{
@@ -34,6 +41,9 @@ export function UserStatusProvider({ children }) {
             return;
           },
           signOut: function () {
+            deleteKey(TOKEN).catch((e) => {console.log(e); Alert.alert("There was an error deleting the token")})
+            setRegisteredAsDriverState(false);
+            setDriverModeState(false);
             setIsSignedInState(false);
             return;
           },
@@ -50,6 +60,19 @@ export function UserStatusProvider({ children }) {
             return;
           },
         },
+
+        registeredAsDriver: {
+          value: registeredAsDriverState,
+          setIsRegistered: function() {
+            setRegisteredAsDriverState(true);
+            return;
+          },
+          setIsNotRegistered: function () {
+            setRegisteredAsDriverState(false);
+            return;
+          },
+        },
+        
       }}
     >
       <UserTokenContext.Provider
@@ -59,7 +82,7 @@ export function UserStatusProvider({ children }) {
           },
           set: function (value) {
             console.log("Saving token: " + value);
-            save(TOKEN, value);
+            saveKey(TOKEN, value);
             return;
           },
         }}

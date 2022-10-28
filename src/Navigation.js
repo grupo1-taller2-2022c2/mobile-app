@@ -15,7 +15,7 @@ import Login from "./Screens/Login";
 import Register from "./Screens/Register";
 import MyProfile from "./Screens/MyProfile";
 import Map from "./Screens/Map";
-import DriverRegister from "./Screens/Driver/DriverRegister";
+import DriverRegister from "./Screens/DriverRegister";
 import DriverHome from "./Screens/Driver/DriverHome";
 import DriverMyProfile from "./Screens/Driver/DriverMyProfile";
 
