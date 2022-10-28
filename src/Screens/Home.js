@@ -62,7 +62,7 @@ export default function Home({ navigation }) {
               return tryGetMyProfile(token);
             })
             .then((response) => {
-              navigation.navigate("MyProfile", { data: response.data });
+              navigation.navigate("MyProfile", {data: response.data});
             })
             .catch((e) => {
               console.log(e);

@@ -91,6 +91,7 @@ export default function Register(props) {
               props.navigation.navigate("Login");
             })
             .catch((e) => {
+                console.log(e)
               if (e.response && e.response.status === 409) {
                 console.log(e.response.data.detail)
                 alertUserAlreadyExists();

@@ -1,9 +1,11 @@
 export const API_GATEWAY_PORT = "3005";
 export const SIGNIN_EP = "/token";
 export const SIGNUP_EP = "/users/signup";
-export const ME_EP = "/passengers/me/"
-export const DRIVER_ME_EP = "/drivers/me/"
-export const ADD_VEHICLE_EP = "/drivers/vehicle"
+export const ME_EP = "/passengers/me/";
+export const EDIT_PROF_EP = "/passengers/";
+export const DRIVER_ME_EP = "/drivers/me/";
+export const EDIT_DRIVER_PROF_EP = "/drivers/";
+export const ADD_VEHICLE_EP = "/drivers/vehicle";
 export const GOOGLE_MAPS_APIKEY = "AIzaSyD3H-dhvbdSHcltS1cJQp10oty-xO9faPE";
 
 export const HTTP_STATUS_OK = 200;

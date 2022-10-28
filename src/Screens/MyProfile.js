@@ -10,6 +10,7 @@ import {
 import { styles } from "../Styles";
 import profilePicture from "../../assets/user-placeholder.png";
 export default function MyProfile({route, navigation}) {
+    console.log("Entered Profile!");
   const {data} = route.params;
   return (
     <View style={styles.myProfile}>
@@ -19,6 +20,11 @@ export default function MyProfile({route, navigation}) {
       <Text style={{ color: "#fff", fontSize: 24 }}>Name: {data.username} {data.surname}</Text>
       <Text style={{ color: "#fff", fontSize: 24 }}>Rating: {data.ratings}/5</Text>
       </View>
+        <TouchableOpacity style={[styles.button,{marginTop: 70}]} onPress={() => {
+            navigation.navigate("EditProfile", {data: data});
+        }} >
+            <Text style={{ color: "#fff", fontSize: 24 }}>Edit Profile</Text>
+        </TouchableOpacity>
       <TouchableOpacity style={[styles.button,{marginTop: 70}]} onPress={() => {
         navigation.navigate("Home")
       }} >
