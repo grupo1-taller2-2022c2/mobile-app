@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { styles } from "../../Styles";
+import { styles } from "../Styles";
 import axios from "axios";
 import Constants from "expo-constants";
-import { userToken } from "../../UserContext";
+import { getUserStatus, getUserToken } from "../UserContext";
 
 import {
   Text,
@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
-import { API_GATEWAY_PORT, ADD_VEHICLE_EP } from "../../Constants";
+import { API_GATEWAY_PORT, ADD_VEHICLE_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, HTTP_STATUS_VALID_ERROR, HTTP_STATUS_UNATHORIZED } from "../Constants";
 
 const localhost = Constants.manifest.extra.localhost;
 const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + ADD_VEHICLE_EP;
@@ -34,7 +34,8 @@ function tryAddVehicle(licence_plate, model, token) {
 export default function DriverRegister(props) {
   const [licence_plate, onChangeLicencePlate] = useState("");
   const [model, onChangeModel] = useState("");
-  const token = userToken();
+  const token = getUserToken();
+  const userStatus = getUserStatus();
 
   return (
     <View style={styles.container}>
@@ -61,20 +62,33 @@ export default function DriverRegister(props) {
           token
             .value()
             .catch((e) => {
-              console.log("Session Expired");
-              Alert.alert("Session Expired");
-              //FIXME: Add session expired code
+              console.log("Token not found");
+              Alert.alert("Something went wrong!");
+              userStatus.signInState.signOut()
             })
             .then((token) => {
-              tryAddVehicle(licence_plate, model, token);
+              return tryAddVehicle(licence_plate, model, token);
             })
-            .then(() => {
+            .then((response) => {
+              console.log("then: " + response)
+              userStatus.registeredAsDriver.setIsRegistered();
               Alert.alert("Successfully added vehicle!");
               props.navigation.navigate("Home");
             })
             .catch((e) => {
-              console.log(e);
-              alertWrongCredentials();
+              const status_code = e.response.status;
+              console.log("catch: " + e);
+              if (status_code == HTTP_STATUS_VALID_ERROR) {
+                alertWrongCredentials();
+              }
+              else if (status_code == HTTP_STATUS_UNATHORIZED){
+                Alert.alert(SESSION_EXPIRED_MSG);
+                userStatus.signInState.signOut();
+              }
+              else {
+                Alert.alert(GENERIC_ERROR_MSG);
+                userStatus.signInState.signOut();
+              }
             });
         }}
       >

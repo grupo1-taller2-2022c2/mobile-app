@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
-import { userStatus, userToken } from "../UserContext";
+import { getUserStatus, getUserToken } from "../UserContext";
 
 const localhost = Constants.manifest.extra.localhost;
 const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + SIGNIN_EP;
@@ -35,8 +35,8 @@ export default function Login({ navigation }) {
   const [email, onChangeEmail] = useState(null);
   const [password, onChangePassword] = useState(null);
 
-  const userIsSignedIn = userStatus();
-  const token = userToken();
+  const userStatus = getUserStatus();
+  const token = getUserToken();
 
   return (
     <View style={styles.container}>
@@ -67,7 +67,7 @@ export default function Login({ navigation }) {
               console.log("Got response at Sign In!")
               let token_data = response.data["access_token"];
               token.set(token_data);
-              userIsSignedIn.set(true);
+              userStatus.signInState.signIn();
             })
             .catch((e) => {
               console.log("Did not get response at Sign In")

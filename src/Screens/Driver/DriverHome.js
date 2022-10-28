@@ -8,8 +8,8 @@ import {
   Button,
 } from "react-native";
 import { styles } from "../../Styles";
-import { userStatus, userToken } from "../../UserContext";
-import { API_GATEWAY_PORT, DRIVER_ME_EP } from "../../Constants";
+import { getUserStatus, getUserToken } from "../../UserContext";
+import { API_GATEWAY_PORT, DRIVER_ME_EP, HTTP_STATUS_UNATHORIZED,HTTP_STATUS_DOESNT_EXIST, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG } from "../../Constants";
 import Constants from "expo-constants";
 
 const localhost = Constants.manifest.extra.localhost;
@@ -22,8 +22,8 @@ function tryGetMyProfile(token) {
 }
 
 export default function DriverHome({ navigation }) {
-  const userIsSignedIn = userStatus();
-  const token = userToken();
+  const userStatus = getUserStatus();
+  const token = getUserToken();
   return (
     <View style={styles.container}>
       <Text
@@ -36,7 +36,7 @@ export default function DriverHome({ navigation }) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          userIsSignedIn.set(false);
+          userStatus.signInState.signOut();
         }}
       >
         <Text style={styles.buttonText}>Log out</Text>
@@ -48,9 +48,9 @@ export default function DriverHome({ navigation }) {
           token
             .value()
             .catch((e) => {
-              console.log("Session Expired");
-              Alert.alert("Session Expired");
-              //FIXME: Add session expired code
+              console.log("Token not found");
+              Alert.alert("Something went wrong!");
+              userStatus.signInState.signOut();
             })
             .then((token) => {
               return tryGetMyProfile(token);
@@ -59,8 +59,19 @@ export default function DriverHome({ navigation }) {
               navigation.navigate("DriverMyProfile", { data: response.data });
             })
             .catch((e) => {
+              const status_code = e.response.status;
               console.log(e);
-              console.log(apiUrl);
+              if (status_code == HTTP_STATUS_DOESNT_EXIST) 
+              //FIXME: Maybe unreachable
+              {Alert.alert("You are not registered as a driver");}
+              else if (status_code == HTTP_STATUS_UNATHORIZED)  {
+                Alert.alert(SESSION_EXPIRED_MSG);
+                userStatus.signInState.signOut();
+              }
+              else {
+                Alert.alert(GENERIC_ERROR_MSG);
+                userStatus.signInState.signOut();
+              }
             });
         }}
       >
@@ -70,7 +81,7 @@ export default function DriverHome({ navigation }) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          navigation.navigate("Home");
+          userStatus.driverMode.exit()
         }}
       >
         <Text style={styles.buttonText}>Switch to Passenger mode</Text>
