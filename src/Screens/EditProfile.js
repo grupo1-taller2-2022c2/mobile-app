@@ -36,7 +36,7 @@ function PickAnImage() {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
-            aspect: [4, 3],
+            aspect: [3, 3],
             quality: 1,
         });
         if (!result.cancelled) {
@@ -45,10 +45,10 @@ function PickAnImage() {
     };
 
     return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
+        <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+            {image && <Image source={{ uri: image }} style={{ width: 200, height: 200, resizeMode: "contain"}} />}
             {!image && <Image source={profilePicture} style={{height: 200, width:200, resizeMode: "contain"}}/>}
-            <br/>
+            <Text>{"\n"}</Text>
             <Button title="Pick an image" onPress={pickImage} />
         </View>
     );
@@ -69,6 +69,7 @@ export default function EditProfile({route, navigation}) {
                 Please, enter your new profile information!
             </Text>
             <PickAnImage/>
+            <Text>{"\n"}</Text>
             <TextInput
                 style={styles.input}
                 onChangeText={onChangeName}

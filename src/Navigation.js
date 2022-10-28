@@ -19,6 +19,7 @@ import Map from "./Screens/Map";
 import DriverRegister from "./Screens/DriverRegister";
 import DriverHome from "./Screens/Driver/DriverHome";
 import DriverMyProfile from "./Screens/Driver/DriverMyProfile";
+import DriverEditProfile from "./Screens/Driver/DriverEditProfile";
 
 export function NavigationStack() {
   const userStatus = getUserStatus();
@@ -36,6 +37,11 @@ export function NavigationStack() {
               name="DriverMyProfile"
               component={DriverMyProfile}
               options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="DriverEditProfile"
+                component={DriverEditProfile}
+                options={{ headerShown: false }}
             />
           </>
         ) : (
