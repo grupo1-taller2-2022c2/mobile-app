@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { styles } from "../Styles";
 import { getUserStatus, getUserToken } from "../UserContext";
-import { API_GATEWAY_PORT, DRIVER_ME_EP, ME_EP } from "../Constants";
+import { API_GATEWAY_PORT, DRIVER_ME_EP, ME_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG } from "../Constants";
 import Constants from "expo-constants";
 import {updateDriverStatus} from "./Utils";
 
@@ -66,7 +66,8 @@ export default function Home({ navigation }) {
             })
             .catch((e) => {
               console.log(e);
-              Alert.alert("Session expired: Please sign in again");
+              //FIXME: is this truly the only error case?
+              Alert.alert(SESSION_EXPIRED_MSG);
               userStatus.signInState.signOut();
             });
         }}

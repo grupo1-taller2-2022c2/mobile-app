@@ -9,3 +9,7 @@ export const GOOGLE_MAPS_APIKEY = "AIzaSyD3H-dhvbdSHcltS1cJQp10oty-xO9faPE";
 export const HTTP_STATUS_OK = 200;
 export const HTTP_STATUS_UNATHORIZED = 401;
 export const HTTP_STATUS_DOESNT_EXIST = 404;
+export const HTTP_STATUS_VALID_ERROR = 422;
+
+export const SESSION_EXPIRED_MSG = "Session expired: Please sign in again";
+export const GENERIC_ERROR_MSG = "Something went wrong!";

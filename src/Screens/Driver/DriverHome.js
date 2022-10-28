@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { styles } from "../../Styles";
 import { getUserStatus, getUserToken } from "../../UserContext";
-import { API_GATEWAY_PORT, DRIVER_ME_EP, HTTP_STATUS_UNATHORIZED,HTTP_STATUS_DOESNT_EXIST } from "../../Constants";
+import { API_GATEWAY_PORT, DRIVER_ME_EP, HTTP_STATUS_UNATHORIZED,HTTP_STATUS_DOESNT_EXIST, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG } from "../../Constants";
 import Constants from "expo-constants";
 
 const localhost = Constants.manifest.extra.localhost;
@@ -62,13 +62,14 @@ export default function DriverHome({ navigation }) {
               const status_code = e.response.status;
               console.log(e);
               if (status_code == HTTP_STATUS_DOESNT_EXIST) 
+              //FIXME: Maybe unreachable
               {Alert.alert("You are not registered as a driver");}
               else if (status_code == HTTP_STATUS_UNATHORIZED)  {
-                Alert.alert("Session expired: Please sign in again");
+                Alert.alert(SESSION_EXPIRED_MSG);
                 userStatus.signInState.signOut();
               }
               else {
-                Alert.alert("Something went wrong!");
+                Alert.alert(GENERIC_ERROR_MSG);
                 userStatus.signInState.signOut();
               }
             });
