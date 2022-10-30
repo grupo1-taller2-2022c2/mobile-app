@@ -2,11 +2,9 @@ import axios from "axios";
 import {
   Alert,
 } from "react-native";
-import { API_GATEWAY_PORT, DRIVER_ME_EP } from "../Constants";
-import Constants from "expo-constants";
+import { API_GATEWAY_HOST, API_GATEWAY_PORT, DRIVER_ME_EP } from "../Constants";
 
-const localhost = Constants.manifest.extra.localhost;
-const driverUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + DRIVER_ME_EP;
+const driverUrl = "http://" + API_GATEWAY_HOST + ":" + API_GATEWAY_PORT + DRIVER_ME_EP;
 function checkIfIAmDriver(token) {
   return axios.get(driverUrl, {
     headers: { Authorization: "Bearer " + token },

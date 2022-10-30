@@ -1,3 +1,6 @@
+import {REACT_APP_API_GATEWAY_HOST} from '@env'
+
+export const API_GATEWAY_HOST = REACT_APP_API_GATEWAY_HOST
 export const API_GATEWAY_PORT = "3005";
 export const SIGNIN_EP = "/token";
 export const SIGNUP_EP = "/users/signup";
