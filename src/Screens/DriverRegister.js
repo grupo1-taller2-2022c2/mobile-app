@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { styles } from "../Styles";
 import axios from "axios";
-import Constants from "expo-constants";
 import { getUserStatus, getUserToken } from "../UserContext";
 
 import {
@@ -12,10 +11,9 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
-import { API_GATEWAY_PORT, ADD_VEHICLE_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, HTTP_STATUS_VALID_ERROR, HTTP_STATUS_UNATHORIZED } from "../Constants";
+import { API_GATEWAY_HOST, API_GATEWAY_PORT, ADD_VEHICLE_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, HTTP_STATUS_VALID_ERROR, HTTP_STATUS_UNATHORIZED } from "../Constants";
 
-const localhost = Constants.manifest.extra.localhost;
-const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + ADD_VEHICLE_EP;
+const apiUrl = "http://" + API_GATEWAY_HOST + ":" + API_GATEWAY_PORT + ADD_VEHICLE_EP;
 
 function alertWrongCredentials() {
   Alert.alert("Please enter valid vehicle credentials!");

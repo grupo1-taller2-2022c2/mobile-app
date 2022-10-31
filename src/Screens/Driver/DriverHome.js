@@ -9,11 +9,9 @@ import {
 } from "react-native";
 import { styles } from "../../Styles";
 import { getUserStatus, getUserToken } from "../../UserContext";
-import { API_GATEWAY_PORT, DRIVER_ME_EP, HTTP_STATUS_UNATHORIZED,HTTP_STATUS_DOESNT_EXIST, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG } from "../../Constants";
-import Constants from "expo-constants";
+import { API_GATEWAY_PORT, DRIVER_ME_EP, HTTP_STATUS_UNATHORIZED,HTTP_STATUS_DOESNT_EXIST, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, API_GATEWAY_HOST } from "../../Constants";
 
-const localhost = Constants.manifest.extra.localhost;
-const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + DRIVER_ME_EP;
+const apiUrl = "http://" + API_GATEWAY_HOST + ":" + API_GATEWAY_PORT + DRIVER_ME_EP;
 
 function tryGetMyProfile(token) {
   return axios.get(apiUrl, {
