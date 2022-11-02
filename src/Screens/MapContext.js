@@ -14,6 +14,7 @@ export function MapContextProvider({ children }) {
   const [destinationAddress, setDestinationAddress] = useState(null);
   const [tripModalVisible, setTripModalVisible] = useState(false);
   const [estimatedTripPrice, setEstimatedTripPrice] = useState(0);
+  const [tripID, setTripID] = useState(null)
 
   return (
     <MapContext.Provider
@@ -26,6 +27,7 @@ export function MapContextProvider({ children }) {
           destinationAddress,
           tripModalVisible,
           estimatedTripPrice,
+          tripID
         },
         setters: {
           onChangeDestinationInput,
@@ -35,6 +37,7 @@ export function MapContextProvider({ children }) {
           setDestinationAddress,
           setTripModalVisible,
           setEstimatedTripPrice,
+          setTripID
         },
       }}
     >

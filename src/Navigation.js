@@ -18,6 +18,7 @@ import Map from "./Screens/Map";
 import DriverRegister from "./Screens/DriverRegister";
 import DriverHome from "./Screens/Driver/DriverHome";
 import DriverMyProfile from "./Screens/Driver/DriverMyProfile";
+import WaitingForDriver from "./Screens/WaitingForDriver";
 
 export function NavigationStack() {
   const userStatus = getUserStatus();
@@ -52,6 +53,11 @@ export function NavigationStack() {
             <Stack.Screen
               name="Map"
               component={Map}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="WaitingForDriver"
+              component={WaitingForDriver}
               options={{ headerShown: false }}
             />
             <Stack.Screen

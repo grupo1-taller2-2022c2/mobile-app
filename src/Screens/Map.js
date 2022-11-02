@@ -10,12 +10,14 @@ import {
   SESSION_EXPIRED_MSG,
   GOOGLE_DISTANCE_MATRIX_URL,
   HTTP_STATUS_UNAUTHORIZED,
+  START_DRIVER_LOOKUP_EP
 } from "../Constants";
 import { mapContext, MapContextProvider } from "./MapContext";
 import Constants from "expo-constants";
 import { getUserStatus, getUserToken } from "../UserContext";
 import axios from "axios";
 import { map_styles, modal_styles } from "./MapStyles";
+import { NavigationContext } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get("window");
 
@@ -37,7 +39,7 @@ import {
 } from "react-native";
 
 const localhost = Constants.manifest.extra.localhost;
-const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + TRIP_COST_EP;
+const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT;
 
 //FIXME this is hardcoded
 function tryGetTripPrice(
@@ -49,7 +51,7 @@ function tryGetTripPrice(
   duration,
   distance
 ) {
-  return axios.get(apiUrl, {
+  return axios.get(apiUrl + TRIP_COST_EP, {
     headers: { Authorization: "Bearer " + token },
     params: {
       src_address: src_street,
@@ -68,6 +70,14 @@ function tryGetTripDistanceAndTime(origin, destination) {
       origins: encodeURI(origin),
       destinations: encodeURI(destination),
       key: encodeURI(GOOGLE_MAPS_APIKEY),
+    },
+  });
+}
+
+function tryStartDriverLookup(tripID) {
+  return axios.get(apiUrl + START_DRIVER_LOOKUP_EP, {
+    data: {
+      trip_id: tripID
     },
   });
 }
@@ -99,6 +109,7 @@ function SearchTab() {
     setDestinationCoords,
     setDestinationAddress,
     setEstimatedTripPrice,
+    setTripID
   } = context.setters;
   let { destinationInput, userAddress, userLocation } = context.values;
 
@@ -167,7 +178,8 @@ function SearchTab() {
                 duration.value / 60,
                 distance.value
               );
-
+              
+              setTripID(tripPriceResponse.data.trip_id)
               let tripPrice = Math.round(tripPriceResponse.data.price);
               console.log("Estimated price: " + tripPrice);
               setEstimatedTripPrice(tripPrice);
@@ -219,8 +231,10 @@ function SearchTab() {
 function MyMapView() {
   const context = mapContext();
   let { setTripModalVisible } = context.setters;
-  let { userLocation, destinationCoords, tripModalVisible } =
+  let { userLocation, destinationCoords, tripModalVisible, tripID } =
     context.values;
+  const navigation = React.useContext(NavigationContext);
+
   return (
     <>
       <MapView
@@ -265,7 +279,16 @@ function MyMapView() {
               </Text>
               <Pressable
                 style={[modal_styles.button, modal_styles.buttonClose]}
-                onPress={() => {
+                onPress={async () => {
+                  try {
+                    //await tryStartDriverLookup(tripID)
+                    let assignedDriver = "Juancito McDriver"
+                    navigation.navigate("WaitingForDriver", {assignedDriver})
+                  }
+                  catch (e) {
+                    console.log(e)
+                    Alert.alert("Could not perform driver lookup")
+                  }
                   setTripModalVisible(!tripModalVisible);
                 }}
               >
