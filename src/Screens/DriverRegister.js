@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
-import { API_GATEWAY_PORT, ADD_VEHICLE_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, HTTP_STATUS_VALID_ERROR, HTTP_STATUS_UNATHORIZED } from "../Constants";
+import { API_GATEWAY_PORT, ADD_VEHICLE_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, HTTP_STATUS_VALID_ERROR, HTTP_STATUS_UNAUTHORIZED } from "../Constants";
 
 const localhost = Constants.manifest.extra.localhost;
 const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + ADD_VEHICLE_EP;
@@ -81,7 +81,7 @@ export default function DriverRegister(props) {
               if (status_code == HTTP_STATUS_VALID_ERROR) {
                 alertWrongCredentials();
               }
-              else if (status_code == HTTP_STATUS_UNATHORIZED){
+              else if (status_code == HTTP_STATUS_UNAUTHORIZED){
                 Alert.alert(SESSION_EXPIRED_MSG);
                 userStatus.signInState.signOut();
               }

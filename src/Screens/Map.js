@@ -9,6 +9,7 @@ import {
   API_GATEWAY_PORT,
   SESSION_EXPIRED_MSG,
   GOOGLE_DISTANCE_MATRIX_URL,
+  HTTP_STATUS_UNAUTHORIZED,
 } from "../Constants";
 import { mapContext, MapContextProvider } from "./MapContext";
 import Constants from "expo-constants";
@@ -77,9 +78,11 @@ async function getCoordsFromAddress(address) {
   let location;
   try {
     let result = await Location.geocodeAsync(address);
+    if (result.length === 0) {
+      return null;
+    }
     location = result[0];
   } catch (error) {
-    Alert.alert("Error", "Could not find the address");
     return null;
   }
   return location;
@@ -96,7 +99,6 @@ function SearchTab() {
     setDestinationCoords,
     setDestinationAddress,
     setEstimatedTripPrice,
-    setValidInput,
   } = context.setters;
   let { destinationInput, userAddress, userLocation } = context.values;
 
@@ -112,94 +114,63 @@ function SearchTab() {
         />
         <TouchableOpacity
           style={map_styles.button}
-          onPress={() => {
-            getCoordsFromAddress(destinationInput).then((input_coordinates) => {
-              if (!input_coordinates) {
-                Alert.alert("Error", "Invalid address");
+          onPress={async () => {
+            try {
+              let input_coordinates = await getCoordsFromAddress(
+                destinationInput
+              );
+              if (input_coordinates === null) {
+                Alert.alert("Please enter a valid address");
                 return;
               }
+
               setDestinationCoords(input_coordinates);
               //FIXME no other error case?
-              Location.reverseGeocodeAsync({
+              let addresses = await Location.reverseGeocodeAsync({
                 latitude: input_coordinates.latitude,
                 longitude: input_coordinates.longitude,
-              })
-                .then((addresses) => {
-                  let currentDestAddress = addresses[0];
-                  //Note: we cant use this state value in this scope!
-                  setDestinationAddress(addresses[0]);
-                  //Ask for estimated price to gateway
-                  token
-                    .value()
-                    .catch((e) => {
-                      console.log("Token not found");
-                      Alert.alert("Something went wrong!");
-                      userStatus.signInState.signOut();
-                    })
-                    .then((token) => {
-                      console.log("Src Street: " + userAddress.street);
-                      console.log("Src Number: " + userAddress.streetNumber);
-                      console.log("Dst Street: " + currentDestAddress.street);
-                      console.log(
-                        "Dst Number: " + currentDestAddress.streetNumber
-                      );
-                      //test
-                      let originGoogle =
-                        userLocation.coords.latitude +
-                        "," +
-                        userLocation.coords.longitude;
-                      let destinationGoogle =
-                        input_coordinates.latitude +
-                        "," +
-                        input_coordinates.longitude;
-                      tryGetTripDistanceAndTime(
-                        originGoogle,
-                        destinationGoogle
-                      ).then((response) => {
-                        let { distance, duration } =
-                          response.data.rows[0].elements[0];
-                        return tryGetTripPrice(
-                          token,
-                          userAddress.street,
-                          userAddress.streetNumber,
-                          currentDestAddress.street,
-                          currentDestAddress.streetNumber,
-                          duration.value / 60,
-                          distance.value
-                        )
-                          .then((response) => {
-                            console.log(
-                              "Estimated price: " +
-                                Math.round(response.data.price)
-                            );
-                            setEstimatedTripPrice(
-                              Math.round(response.data.price)
-                            );
-                            //FIXME: same as below
-                            setValidInput(true);
-                            return;
-                          })
-                          .catch((e) => {
-                            console.log(e);
-                            Alert.alert(
-                              "Please enter destination in address format"
-                            );
-                            //FIXME: temporary fix to not show modal after invalid input, should clean up code
-                            setValidInput(false);
-                            return;
-                          });
-                      });
-                    })
-                    .catch((e) => {
-                      //FIXME add more error cases depending on response code
-                      console.log(e);
-                      Alert.alert(SESSION_EXPIRED_MSG);
-                      userStatus.signInState.signOut();
-                    });
-                })
-                .catch((e) => {
-                  console.log(e);
-                });
+              });
+
+              let currentDestAddress = addresses[0];
+     
+              setDestinationAddress(addresses[0]);
+
+              let userToken;
+              try {
+                userToken = await token.value();
+              } catch (e) {
+                //Should be unreachable
+                console.log("Token not found");
+                Alert.alert("Something went wrong!");
+                userStatus.signInState.signOut();
+              }
+
+              let originGoogle =
+                userLocation.coords.latitude +
+                "," +
+                userLocation.coords.longitude;
+              let destinationGoogle =
+                input_coordinates.latitude + "," + input_coordinates.longitude;
+
+              let response = await tryGetTripDistanceAndTime(
+                originGoogle,
+                destinationGoogle
+              );
+              let { distance, duration } = response.data.rows[0].elements[0];
+
+              let tripPriceResponse = await tryGetTripPrice(
+                userToken,
+                userAddress.street,
+                userAddress.streetNumber,
+                currentDestAddress.street,
+                currentDestAddress.streetNumber,
+                duration.value / 60,
+                distance.value
+              );
+
+              let tripPrice = Math.round(tripPriceResponse.data.price);
+              console.log("Estimated price: " + tripPrice);
+              setEstimatedTripPrice(tripPrice);
 
               mapRef.current.animateToRegion(
                 {
@@ -215,7 +186,19 @@ function SearchTab() {
               setTimeout(() => {
                 setTripModalVisible(true);
               }, PROMPT_WAIT_TIME);
-            });
+
+            } catch (error) {
+              if (error.response.status) {
+                const status_code = error.response.status;
+                if (status_code == HTTP_STATUS_UNAUTHORIZED) {
+                  Alert.alert(SESSION_EXPIRED_MSG);
+                  userStatus.signInState.signOut();
+                  return;
+                }
+              }
+              //FIXME: differentiate error cases here
+              Alert.alert("Error", "Could not resolve, try again!");
+            }
           }}
         >
           <Text style={map_styles.buttonText}>Go!</Text>
@@ -235,8 +218,8 @@ function SearchTab() {
 
 function MyMapView() {
   const context = mapContext();
-  let { setTripModalVisible, setValidInput } = context.setters;
-  let { userLocation, destinationCoords, tripModalVisible, validInput } =
+  let { setTripModalVisible } = context.setters;
+  let { userLocation, destinationCoords, tripModalVisible } =
     context.values;
   return (
     <>
@@ -264,14 +247,13 @@ function MyMapView() {
           />
         ) : null}
       </MapView>
-      {tripModalVisible & validInput ? (
+      {tripModalVisible ? (
         <Modal
           animationType="fade"
           transparent={true}
           visible={tripModalVisible}
           onRequestClose={() => {
             setTripModalVisible(!tripModalVisible);
-            setValidInput(!validInput);
           }}
         >
           <View style={modal_styles.centeredView}>
@@ -285,7 +267,6 @@ function MyMapView() {
                 style={[modal_styles.button, modal_styles.buttonClose]}
                 onPress={() => {
                   setTripModalVisible(!tripModalVisible);
-                  setValidInput(!validInput);
                 }}
               >
                 <Text style={modal_styles.textStyle}>Start the search!</Text>
@@ -294,7 +275,6 @@ function MyMapView() {
                 style={[modal_styles.button, modal_styles.buttonClose]}
                 onPress={() => {
                   setTripModalVisible(!tripModalVisible);
-                  setValidInput(!validInput);
                 }}
               >
                 <Text style={modal_styles.textStyle}>
