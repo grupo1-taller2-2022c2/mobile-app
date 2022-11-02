@@ -8,6 +8,7 @@ import {
   TRIP_COST_EP,
   API_GATEWAY_PORT,
   SESSION_EXPIRED_MSG,
+  GOOGLE_DISTANCE_MATRIX_URL,
 } from "../Constants";
 import { mapContext, MapContextProvider } from "./MapContext";
 import Constants from "expo-constants";
@@ -43,7 +44,9 @@ function tryGetTripPrice(
   src_street,
   src_number,
   dst_street,
-  dst_number
+  dst_number,
+  duration,
+  distance
 ) {
   return axios.get(apiUrl, {
     headers: { Authorization: "Bearer " + token },
@@ -52,8 +55,18 @@ function tryGetTripPrice(
       src_number: src_number,
       dst_address: dst_street,
       dst_number: dst_number,
-      duration: 45,
-      distance: 35,
+      duration: duration,
+      distance: distance,
+    },
+  });
+}
+
+function tryGetTripDistanceAndTime(origin, destination) {
+  return axios.get(GOOGLE_DISTANCE_MATRIX_URL, {
+    params: {
+      origins: encodeURI(origin),
+      destinations: encodeURI(destination),
+      key: encodeURI(GOOGLE_MAPS_APIKEY),
     },
   });
 }
@@ -83,8 +96,9 @@ function SearchTab() {
     setDestinationCoords,
     setDestinationAddress,
     setEstimatedTripPrice,
+    setValidInput,
   } = context.setters;
-  let { destinationInput, userAddress } = context.values;
+  let { destinationInput, userAddress, userLocation } = context.values;
 
   return (
     <View style={{ margin: 50, marginBottom: 10 }}>
@@ -126,20 +140,55 @@ function SearchTab() {
                       console.log("Src Street: " + userAddress.street);
                       console.log("Src Number: " + userAddress.streetNumber);
                       console.log("Dst Street: " + currentDestAddress.street);
-                      console.log("Dst Number: " + currentDestAddress.streetNumber);
-
-                      return tryGetTripPrice(
-                        token,
-                        userAddress.street,
-                        userAddress.streetNumber,
-                        currentDestAddress.street,
-                        currentDestAddress.streetNumber
+                      console.log(
+                        "Dst Number: " + currentDestAddress.streetNumber
                       );
-                    })
-                    .then((response) => {
-                      console.log("Estimated price: " + response.data.price);
-                      setEstimatedTripPrice(response.data.price);
-                      return;
+                      //test
+                      let originGoogle =
+                        userLocation.coords.latitude +
+                        "," +
+                        userLocation.coords.longitude;
+                      let destinationGoogle =
+                        input_coordinates.latitude +
+                        "," +
+                        input_coordinates.longitude;
+                      tryGetTripDistanceAndTime(
+                        originGoogle,
+                        destinationGoogle
+                      ).then((response) => {
+                        let { distance, duration } =
+                          response.data.rows[0].elements[0];
+                        return tryGetTripPrice(
+                          token,
+                          userAddress.street,
+                          userAddress.streetNumber,
+                          currentDestAddress.street,
+                          currentDestAddress.streetNumber,
+                          duration.value / 60,
+                          distance.value
+                        )
+                          .then((response) => {
+                            console.log(
+                              "Estimated price: " +
+                                Math.round(response.data.price)
+                            );
+                            setEstimatedTripPrice(
+                              Math.round(response.data.price)
+                            );
+                            //FIXME: same as below
+                            setValidInput(true);
+                            return;
+                          })
+                          .catch((e) => {
+                            console.log(e);
+                            Alert.alert(
+                              "Please enter destination in address format"
+                            );
+                            //FIXME: temporary fix to not show modal after invalid input, should clean up code
+                            setValidInput(false);
+                            return;
+                          });
+                      });
                     })
                     .catch((e) => {
                       //FIXME add more error cases depending on response code
@@ -186,8 +235,9 @@ function SearchTab() {
 
 function MyMapView() {
   const context = mapContext();
-  let { setTripModalVisible } = context.setters;
-  let { userLocation, destinationCoords, tripModalVisible } = context.values;
+  let { setTripModalVisible, setValidInput } = context.setters;
+  let { userLocation, destinationCoords, tripModalVisible, validInput } =
+    context.values;
   return (
     <>
       <MapView
@@ -214,13 +264,14 @@ function MyMapView() {
           />
         ) : null}
       </MapView>
-      {tripModalVisible ? (
+      {tripModalVisible & validInput ? (
         <Modal
           animationType="fade"
           transparent={true}
           visible={tripModalVisible}
           onRequestClose={() => {
             setTripModalVisible(!tripModalVisible);
+            setValidInput(!validInput);
           }}
         >
           <View style={modal_styles.centeredView}>
@@ -232,13 +283,19 @@ function MyMapView() {
               </Text>
               <Pressable
                 style={[modal_styles.button, modal_styles.buttonClose]}
-                onPress={() => setTripModalVisible(!tripModalVisible)}
+                onPress={() => {
+                  setTripModalVisible(!tripModalVisible);
+                  setValidInput(!validInput);
+                }}
               >
                 <Text style={modal_styles.textStyle}>Start the search!</Text>
               </Pressable>
               <Pressable
                 style={[modal_styles.button, modal_styles.buttonClose]}
-                onPress={() => setTripModalVisible(!tripModalVisible)}
+                onPress={() => {
+                  setTripModalVisible(!tripModalVisible);
+                  setValidInput(!validInput);
+                }}
               >
                 <Text style={modal_styles.textStyle}>
                   No, choose another destination
