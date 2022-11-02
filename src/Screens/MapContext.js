@@ -8,24 +8,33 @@ export function mapContext() {
 
 export function MapContextProvider({ children }) {
   const [destinationInput, onChangeDestinationInput] = useState(null);
-  const [location, setLocation] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
+  const [userAddress, setUserAddress] = useState(null);
   const [destinationCoords, setDestinationCoords] = useState(null);
+  const [destinationAddress, setDestinationAddress] = useState(null);
   const [tripModalVisible, setTripModalVisible] = useState(false);
+  const [estimatedTripPrice, setEstimatedTripPrice] = useState(0);
 
   return (
     <MapContext.Provider
       value={{
         values: {
           destinationInput,
-          location,
+          userLocation,
+          userAddress,
           destinationCoords,
+          destinationAddress,
           tripModalVisible,
+          estimatedTripPrice,
         },
         setters: {
           onChangeDestinationInput,
-          setLocation,
+          setUserLocation,
+          setUserAddress,
           setDestinationCoords,
+          setDestinationAddress,
           setTripModalVisible,
+          setEstimatedTripPrice,
         },
       }}
     >
