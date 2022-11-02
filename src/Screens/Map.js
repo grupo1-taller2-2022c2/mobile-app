@@ -10,14 +10,14 @@ import {
   SESSION_EXPIRED_MSG,
   GOOGLE_DISTANCE_MATRIX_URL,
   HTTP_STATUS_UNAUTHORIZED,
-  START_DRIVER_LOOKUP_EP
+  START_DRIVER_LOOKUP_EP,
 } from "../Constants";
 import { mapContext, MapContextProvider } from "./MapContext";
 import Constants from "expo-constants";
 import { getUserStatus, getUserToken } from "../UserContext";
 import axios from "axios";
 import { map_styles, modal_styles } from "./MapStyles";
-import { NavigationContext } from '@react-navigation/native';
+import { NavigationContext } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -74,10 +74,12 @@ function tryGetTripDistanceAndTime(origin, destination) {
   });
 }
 
-function tryStartDriverLookup(tripID) {
+function tryStartDriverLookup(token, tripID) {
+  console.log(tripID);
   return axios.get(apiUrl + START_DRIVER_LOOKUP_EP, {
-    data: {
-      trip_id: tripID
+    headers: { Authorization: "Bearer " + token },
+    params: {
+      trip_id: tripID,
     },
   });
 }
@@ -109,7 +111,7 @@ function SearchTab() {
     setDestinationCoords,
     setDestinationAddress,
     setEstimatedTripPrice,
-    setTripID
+    setTripID,
   } = context.setters;
   let { destinationInput, userAddress, userLocation } = context.values;
 
@@ -143,7 +145,7 @@ function SearchTab() {
               });
 
               let currentDestAddress = addresses[0];
-     
+
               setDestinationAddress(addresses[0]);
 
               let userToken;
@@ -178,8 +180,8 @@ function SearchTab() {
                 duration.value / 60,
                 distance.value
               );
-              
-              setTripID(tripPriceResponse.data.trip_id)
+
+              setTripID(tripPriceResponse.data.trip_id);
               let tripPrice = Math.round(tripPriceResponse.data.price);
               console.log("Estimated price: " + tripPrice);
               setEstimatedTripPrice(tripPrice);
@@ -198,7 +200,6 @@ function SearchTab() {
               setTimeout(() => {
                 setTripModalVisible(true);
               }, PROMPT_WAIT_TIME);
-
             } catch (error) {
               if (error.response.status) {
                 const status_code = error.response.status;
@@ -230,6 +231,8 @@ function SearchTab() {
 
 function MyMapView() {
   const context = mapContext();
+  const userStatus = getUserStatus();
+  const token = getUserToken();
   let { setTripModalVisible } = context.setters;
   let { userLocation, destinationCoords, tripModalVisible, tripID } =
     context.values;
@@ -281,13 +284,32 @@ function MyMapView() {
                 style={[modal_styles.button, modal_styles.buttonClose]}
                 onPress={async () => {
                   try {
-                    //await tryStartDriverLookup(tripID)
-                    let assignedDriver = "Juancito McDriver"
-                    navigation.navigate("WaitingForDriver", {assignedDriver})
-                  }
-                  catch (e) {
-                    console.log(e)
-                    Alert.alert("Could not perform driver lookup")
+                    let userToken;
+                    try {
+                      userToken = await token.value();
+                    } catch (e) {
+                      //Should be unreachable
+                      console.log("Token not found");
+                      Alert.alert("Something went wrong!");
+                      userStatus.signInState.signOut();
+                    }
+                    let response = await tryStartDriverLookup(
+                      userToken,
+                      tripID
+                    );
+
+                    let assignedDriver = response.data;
+                    if (assignedDriver === null) {
+                      Alert.alert("There are no drivers available right now!");
+                      setTripModalVisible(!tripModalVisible);
+                      return;
+                    }
+                    navigation.navigate("WaitingForDriver", {
+                      assignedDriver: assignedDriver,
+                    });
+                  } catch (e) {
+                    console.log(e);
+                    Alert.alert("Could not perform driver lookup");
                   }
                   setTripModalVisible(!tripModalVisible);
                 }}
