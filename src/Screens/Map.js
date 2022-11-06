@@ -10,7 +10,7 @@ import {
   SESSION_EXPIRED_MSG,
   GOOGLE_DISTANCE_MATRIX_URL,
   HTTP_STATUS_UNAUTHORIZED,
-  START_DRIVER_LOOKUP_EP,
+  CREATE_TRIP_EP,
 } from "../Constants";
 import { mapContext, MapContextProvider } from "./MapContext";
 import Constants from "expo-constants";
@@ -41,7 +41,6 @@ import {
 const localhost = Constants.manifest.extra.localhost;
 const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT;
 
-//FIXME this is hardcoded
 function tryGetTripPrice(
   token,
   src_street,
@@ -74,14 +73,28 @@ function tryGetTripDistanceAndTime(origin, destination) {
   });
 }
 
-function tryStartDriverLookup(token, tripID) {
-  console.log(tripID);
-  return axios.get(apiUrl + START_DRIVER_LOOKUP_EP, {
-    headers: { Authorization: "Bearer " + token },
-    params: {
-      trip_id: tripID,
+function tryCreateTrip(
+  token,
+  src_address,
+  src_number,
+  dst_address,
+  dst_number,
+  duration,
+  distance
+) {
+  console.log(apiUrl + CREATE_TRIP_EP)
+  return axios.post(
+    apiUrl + CREATE_TRIP_EP,
+    {
+      src_address: src_address,
+      src_number: src_number,
+      dst_address: dst_address,
+      dst_number: dst_number,
+      duration: duration,
+      distance: distance,
+      //trip_type: "NORMAL",
     },
-  });
+    { headers: { Authorization: "Bearer " + token } })
 }
 
 const mapRef = React.createRef();
@@ -111,7 +124,6 @@ function SearchTab() {
     setDestinationCoords,
     setDestinationAddress,
     setEstimatedTripPrice,
-    setTripID,
   } = context.setters;
   let { destinationInput, userAddress, userLocation } = context.values;
 
@@ -181,7 +193,6 @@ function SearchTab() {
                 distance.value
               );
 
-              setTripID(tripPriceResponse.data.trip_id);
               let tripPrice = Math.round(tripPriceResponse.data.price);
               console.log("Estimated price: " + tripPrice);
               setEstimatedTripPrice(tripPrice);
@@ -234,8 +245,13 @@ function MyMapView() {
   const userStatus = getUserStatus();
   const token = getUserToken();
   let { setTripModalVisible } = context.setters;
-  let { userLocation, destinationCoords, tripModalVisible, tripID } =
-    context.values;
+  let {
+    userLocation,
+    destinationCoords,
+    tripModalVisible,
+    destinationInput,
+    userAddress
+  } = context.values;
   const navigation = React.useContext(NavigationContext);
 
   return (
@@ -293,12 +309,49 @@ function MyMapView() {
                       Alert.alert("Something went wrong!");
                       userStatus.signInState.signOut();
                     }
-                    let response = await tryStartDriverLookup(
-                      userToken,
-                      tripID
+                    //FIXME: ALL THIS CODE IS COPIED FROM ANOTHER FUNCTION
+
+                    let input_coordinates = await getCoordsFromAddress(
+                      destinationInput
                     );
 
-                    let assignedDriver = response.data;
+                    let addresses = await Location.reverseGeocodeAsync({
+                      latitude: input_coordinates.latitude,
+                      longitude: input_coordinates.longitude,
+                    });
+
+                    let currentDestAddress = addresses[0];
+
+                    let originGoogle =
+                      userLocation.coords.latitude +
+                      "," +
+                      userLocation.coords.longitude;
+                    let destinationGoogle =
+                      input_coordinates.latitude +
+                      "," +
+                      input_coordinates.longitude;
+
+                    let response = await tryGetTripDistanceAndTime(
+                      originGoogle,
+                      destinationGoogle
+                    );
+                    let { distance, duration } =
+                      response.data.rows[0].elements[0];
+
+                    //END OF COPY CODE
+                    console.log("token: " + userToken)
+                    let create_response = await tryCreateTrip(
+                      userToken,
+                      userAddress.street,
+                      userAddress.streetNumber,
+                      currentDestAddress.street,
+                      currentDestAddress.streetNumber,
+                      duration.value / 60,
+                      distance.value
+                    );
+
+                    let tripId = create_response.data[0];
+                    let assignedDriver = create_response.data[1];
                     if (assignedDriver === null) {
                       Alert.alert("There are no drivers available right now!");
                       setTripModalVisible(!tripModalVisible);
