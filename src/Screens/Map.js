@@ -82,7 +82,7 @@ function tryCreateTrip(
   duration,
   distance
 ) {
-  console.log(apiUrl + CREATE_TRIP_EP)
+  console.log(apiUrl + CREATE_TRIP_EP);
   return axios.post(
     apiUrl + CREATE_TRIP_EP,
     {
@@ -94,7 +94,8 @@ function tryCreateTrip(
       distance: distance,
       //trip_type: "NORMAL",
     },
-    { headers: { Authorization: "Bearer " + token } })
+    { headers: { Authorization: "Bearer " + token } }
+  );
 }
 
 const mapRef = React.createRef();
@@ -244,15 +245,27 @@ function MyMapView() {
   const context = mapContext();
   const userStatus = getUserStatus();
   const token = getUserToken();
-  let { setTripModalVisible } = context.setters;
+  let { setTripModalVisible, setTripID } = context.setters;
   let {
     userLocation,
     destinationCoords,
     tripModalVisible,
     destinationInput,
-    userAddress
+    userAddress,
+    tripID
   } = context.values;
   const navigation = React.useContext(NavigationContext);
+
+  //FIXME: temporary fix
+  const [incomingNavigation, setIncomingNavigation] = React.useState(false);
+  const [assignedDriver, setAssignedDriver] = React.useState(false);
+  useEffect(() => {
+    if (incomingNavigation) {
+      navigation.navigate("WaitingForDriver", {
+        assignedDriver: assignedDriver, tripID: tripID,
+      });
+    }
+  }, [incomingNavigation]);
 
   return (
     <>
@@ -339,7 +352,7 @@ function MyMapView() {
                       response.data.rows[0].elements[0];
 
                     //END OF COPY CODE
-                    console.log("token: " + userToken)
+                    console.log("token: " + userToken);
                     let create_response = await tryCreateTrip(
                       userToken,
                       userAddress.street,
@@ -351,15 +364,19 @@ function MyMapView() {
                     );
 
                     let tripId = create_response.data[0];
+                    console.log("Got tripID: " + tripId);
+                    setTripID(tripId);
                     let assignedDriver = create_response.data[1];
                     if (assignedDriver === null) {
                       Alert.alert("There are no drivers available right now!");
                       setTripModalVisible(!tripModalVisible);
                       return;
                     }
-                    navigation.navigate("WaitingForDriver", {
+                    /*navigation.navigate("WaitingForDriver", {
                       assignedDriver: assignedDriver,
-                    });
+                    })*/ 
+                    setAssignedDriver(assignedDriver);
+                    setIncomingNavigation(true);
                   } catch (e) {
                     console.log(e);
                     Alert.alert("Could not perform driver lookup");
