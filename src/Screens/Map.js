@@ -12,11 +12,11 @@ import {
   HTTP_STATUS_UNAUTHORIZED,
   CREATE_TRIP_EP,
 } from "../Constants";
-import { mapContext, MapContextProvider } from "./MapContext";
+import { mapContext } from "../MapContext";
 import Constants from "expo-constants";
 import { getUserStatus, getUserToken } from "../UserContext";
 import axios from "axios";
-import { map_styles, modal_styles } from "./MapStyles";
+import { map_styles, modal_styles } from "../MapStyles";
 import { NavigationContext } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
@@ -447,8 +447,8 @@ function MyMapScreen() {
 
 export default function Map() {
   return (
-    <MapContextProvider>
+    <>
       <MyMapScreen />
-    </MapContextProvider>
+    </>
   );
 }

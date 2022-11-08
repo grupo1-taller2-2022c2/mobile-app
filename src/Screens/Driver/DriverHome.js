@@ -81,6 +81,15 @@ export default function DriverHome({ navigation }) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
+          navigation.navigate("WaitingForTrip");
+        }}
+      >
+        <Text style={styles.buttonText}>Start Driving!</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
           userStatus.driverMode.exit()
         }}
       >

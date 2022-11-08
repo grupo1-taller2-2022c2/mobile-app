@@ -1,6 +1,6 @@
 import loadingGif from "../../assets/loading-gif.gif";
 import { styles } from "../Styles";
-import { mapContext, MapContextProvider } from "./MapContext";
+import { mapContext, MapContextProvider } from "../MapContext";
 import { GENERIC_ERROR_MSG } from "../Constants";
 import { getUserStatus, getUserToken } from "../UserContext";
 import axios from "axios";
@@ -27,9 +27,6 @@ function tryGetTripState(token, tripID) {
   console.log("Get to " + apiUrl + TRIPS_EP + tripID);
   return axios.get(apiUrl + TRIPS_EP + tripID, {
     headers: { Authorization: "Bearer " + token },
-    /*params: {
-      trip_id: tripID,
-    },*/
   });
 }
 
@@ -63,7 +60,7 @@ export default function WaitingForDriver({ route }) {
     const interval = setInterval(() => {
       console.log("Asking if trip was accepted...");
       isTripAccepted(tripID);
-    }, 4000);
+    }, 5000);
 
     return () => clearInterval(interval)
   });

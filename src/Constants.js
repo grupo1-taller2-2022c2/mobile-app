@@ -8,6 +8,7 @@ export const TRIP_COST_EP = "/trips/cost/"
 export const START_DRIVER_LOOKUP_EP = "/trips/driver_lookup/"
 export const CREATE_TRIP_EP = "/trips/"
 export const TRIPS_EP = "/trips/"
+export const UPDATE_LOCATION_EP = "/drivers/last_location"
 export const GOOGLE_MAPS_APIKEY = "AIzaSyD3H-dhvbdSHcltS1cJQp10oty-xO9faPE";
 export const GOOGLE_DISTANCE_MATRIX_URL = "https://maps.googleapis.com/maps/api/distancematrix/json"
 
