@@ -105,7 +105,7 @@ export default function WaitingForTrip({ route }) {
 
   useEffect(() => {
     console.log("Setting up update interval")
-    const interval = setInterval(() => {updateLocation()}, 10000);
+    const interval = setInterval(() => {updateLocation()}, 5000);
     return () => clearInterval(interval);
   }, []);
 
