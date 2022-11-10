@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { styles } from "../Styles";
 import axios from "axios";
 import qs from "qs";
-import Constants from "expo-constants";
-import { API_GATEWAY_PORT, SIGNIN_EP } from "../Constants";
+import { API_GATEWAY_HOST, API_GATEWAY_PORT, SIGNIN_EP } from "../Constants";
 import {
   Text,
   View,
@@ -14,8 +13,7 @@ import {
 } from "react-native";
 import { getUserStatus, getUserToken } from "../UserContext";
 
-const localhost = Constants.manifest.extra.localhost;
-const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + SIGNIN_EP;
+const apiUrl = "http://" + API_GATEWAY_HOST + ":" + API_GATEWAY_PORT + SIGNIN_EP;
 
 function alertWrongCredentials() {
   Alert.alert("Wrong Credentials!");

@@ -9,12 +9,10 @@ import {
 } from "react-native";
 import { styles } from "../Styles";
 import { getUserStatus, getUserToken } from "../UserContext";
-import { API_GATEWAY_PORT, DRIVER_ME_EP, ME_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG } from "../Constants";
-import Constants from "expo-constants";
+import { API_GATEWAY_HOST, API_GATEWAY_PORT, DRIVER_ME_EP, ME_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG } from "../Constants";
 import {updateDriverStatus} from "./Utils";
 
-const localhost = Constants.manifest.extra.localhost;
-const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + ME_EP;
+const apiUrl = "http://" + API_GATEWAY_HOST + ":" + API_GATEWAY_PORT + ME_EP;
 
 function tryGetMyProfile(token) {
   return axios.get(apiUrl, {
@@ -22,7 +20,7 @@ function tryGetMyProfile(token) {
   });
 }
 
-const driverUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + DRIVER_ME_EP;
+const driverUrl = "http://" + API_GATEWAY_HOST + ":" + API_GATEWAY_PORT + DRIVER_ME_EP;
 function checkIfIAmDriver(token) {
   return axios.get(driverUrl, {
     headers: { Authorization: "Bearer " + token },
