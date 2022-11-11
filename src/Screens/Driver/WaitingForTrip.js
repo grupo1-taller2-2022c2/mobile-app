@@ -32,7 +32,7 @@ const localhost = Constants.manifest.extra.localhost;
 const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT;
 
 function trySendLocation(token, street_name, street_number) {
-  console.log("Post to " + apiUrl + UPDATE_LOCATION_EP);
+  //console.log("Post to " + apiUrl + UPDATE_LOCATION_EP);
 
   return axios.post(
     apiUrl + UPDATE_LOCATION_EP,
@@ -65,7 +65,7 @@ export default function WaitingForTrip({ route }) {
         longitude: location.coords.longitude,
       });
       setUserAddress(addresses[0]);
-      console.log(addresses[0]);
+      //console.log(addresses[0]);
 
       let {street, streetNumber} = addresses[0]
       await checkIfLocationSent(street,parseInt(streetNumber))
@@ -88,7 +88,7 @@ export default function WaitingForTrip({ route }) {
   }
 
   useEffect(() => {
-    console.log("Asking for permission for location");
+    //console.log("Asking for permission for location");
     const setUp = async () => {
       try {
         let { status } = await Location.requestForegroundPermissionsAsync();
@@ -104,7 +104,7 @@ export default function WaitingForTrip({ route }) {
   }, []);
 
   useEffect(() => {
-    console.log("Setting up update interval")
+    //console.log("Setting up update interval")
     const interval = setInterval(() => {updateLocation()}, 5000);
     return () => clearInterval(interval);
   }, []);
@@ -130,6 +130,16 @@ export default function WaitingForTrip({ route }) {
       <Text style={[styles.text, { margin: 30, fontSize: 30 }]}>
         Waiting for Trip Offer...
       </Text>
+
+      <TouchableOpacity
+        style={[styles.button,{backgroundColor: "yellow"}]}
+        onPress={() => {
+          navigation.navigate("TripOfferReceived");
+          console.log("Skipping to TripOfferReceived");
+        }}
+      >
+        <Text style={styles.buttonText}>Advance to trip offer (dev)</Text>
+      </TouchableOpacity>
     </View>
   );
 }
