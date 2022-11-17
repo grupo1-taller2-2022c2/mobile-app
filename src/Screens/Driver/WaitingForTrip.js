@@ -126,8 +126,8 @@ export default function WaitingForTrip({ route }) {
             let response = await tryCheckIfTripAssigned(userToken);
             console.log("Get to " + GATEWAY_URL + ASSIGNED_TRIP_EP);
             console.log(response)
-            if (response.status === HTTP_STATUS_OK && response.data == true) {
-              navigation.navigate("TripOfferReceived");
+            if (response.status === HTTP_STATUS_OK && response.data != null) {
+              navigation.navigate("TripOfferReceived", { data: response.data });
             }
           } catch (error) {
             console.log("No trip assigned yet");

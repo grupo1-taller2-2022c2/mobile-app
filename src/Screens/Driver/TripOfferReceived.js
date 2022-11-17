@@ -47,24 +47,26 @@ export default function TripOfferReceived({route}) {
   const context = mapContext();
   const navigation = React.useContext(NavigationContext);
 
-  /*const {data} = route.params
-  const passenger_profile = data.passenger_profile
-  const trip_id = data.trip_id*/
+  const {data} = route.params
+  //Fixme: to be done from backend
+  //const passenger_profile = data.passenger_profile
+  const trip_id = data
   //FIXME: should receive from context or route
 
   const handleTripRejection = async () => {
-    navigation.navigate("DriverHome")
 
     try {
-      /*const userToken = token.value()
+      const userToken = await token.value()
       const response = await tryRejectTrip(userToken, trip_id);
       if (response.status === HTTP_STATUS_OK) {
         navigation.navigate("DriverHome");
-      } */
+      } 
     } catch (error) {
       console.log(error)
-      Alert.alert(GENERIC_ERROR_MSG);
-      userStatus.signInState.signOut();
+      //FIXME shouldnt navigate anyway
+      navigation.navigate("DriverHome");
+      //Alert.alert(GENERIC_ERROR_MSG);
+      //userStatus.signInState.signOut();
     }
   }
   const mock_profile = {
@@ -119,7 +121,7 @@ export default function TripOfferReceived({route}) {
             { backgroundColor: "dodgerblue", class: "inline", flex: 1 },
           ]}
           onPress={() => {
-            //navigation.navigate("TripOfferReceived");
+            navigation.navigate("PreTrip");
           }}
         >
           <Text style={styles.buttonText}>Accept</Text>
