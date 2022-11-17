@@ -21,6 +21,7 @@ import DriverMyProfile from "./Screens/Driver/DriverMyProfile";
 import WaitingForDriver from "./Screens/WaitingForDriver";
 import WaitingForTrip from "./Screens/Driver/WaitingForTrip";
 import TripOfferReceived from "./Screens/Driver/TripOfferReceived";
+import PreTrip from "./Screens/Driver/PreTrip";
 
 export function NavigationStack() {
   const userStatus = getUserStatus();
@@ -47,6 +48,11 @@ export function NavigationStack() {
             <Stack.Screen
               name="TripOfferReceived"
               component={TripOfferReceived}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="PreTrip"
+              component={PreTrip}
               options={{ headerShown: false }}
             />
           </>

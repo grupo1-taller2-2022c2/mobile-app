@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
-import { GATEWAY_URL, SIGNUP_EP } from "../Constants";
+import { GATEWAY_URL, SIGNUP_EP, USER_ALREADY_EXISTS } from "../Constants";
 
 
 function verify_password(password, pass_repeat) {
@@ -81,21 +81,23 @@ export default function Register(props) {
       />
       <TouchableOpacity
         style={[styles.button, { backgroundColor: "dodgerblue" }]}
-        onPress={() => {
-          trySignUp(email, password, name, surname)
-            .then(() => {
-              Alert.alert("Successful Sign Up!");
-              props.navigation.navigate("Login");
-            })
-            .catch((e) => {
-              if (e.response && e.response.status === 409) {
-                console.log(e.response.data.detail)
-                alertUserAlreadyExists();
-              }
-              else{
-                alertWrongCredentials();
-              }
-            });
+        onPress={async () => {
+          try {
+            let response = await trySignUp(email, password, name, surname)
+            Alert.alert("Successful Sign Up!");
+            props.navigation.navigate("Login");
+          }
+          catch(e) {
+            console.log(e)
+            if (e.response && e.response.status === USER_ALREADY_EXISTS) {
+              console.log(e.response.data.detail)
+              alertUserAlreadyExists();
+            }
+            else{
+              alertWrongCredentials();
+            }
+          }
+          
         }}
       >
         <Text style={styles.buttonText}>Sign up</Text>

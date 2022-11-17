@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { styles } from "../Styles";
 import { getUserStatus, getUserToken } from "../UserContext";
-import { API_GATEWAY_PORT, DRIVER_ME_EP, ME_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, GATEWAY_URL } from "../Constants";
+import { API_GATEWAY_PORT, DRIVER_ME_EP, ME_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, GATEWAY_URL, NOTIF_TOKEN_EP } from "../Constants";
 import {updateDriverStatus} from "./Utils";
 
 
@@ -19,10 +19,14 @@ function tryGetMyProfile(token) {
   });
 }
 
-function checkIfIAmDriver(token) {
-  return axios.get(GATEWAY_URL + DRIVER_ME_EP, {
-    headers: { Authorization: "Bearer " + token },
-  });
+function trySendNotificationsToken(userToken, expoToken) {
+  return axios.post(
+    GATEWAY_URL + NOTIF_TOKEN_EP,
+    {
+      token: expoToken,
+    },
+    { headers: { Authorization: "Bearer " + userToken } }
+  );
 }
 
 export default function Home({ navigation }) {
@@ -98,6 +102,22 @@ export default function Home({ navigation }) {
           <Text style={styles.buttonText}>Register as a Driver!</Text>
         </TouchableOpacity>
       )}
+       <TouchableOpacity
+          style={styles.button}
+          onPress={async () => {
+            try {
+              let userToken = await token.value()
+              //FIXME: add real notification token
+              await trySendNotificationsToken(userToken, "to-be-done")
+            }
+            catch(e) {
+              //FIXME: add more error cases
+              console.log(e)
+            }
+          }}
+        >
+          <Text style={styles.buttonText}>Send Expo Notification Token</Text>
+        </TouchableOpacity>
     </View>
   );
 }
