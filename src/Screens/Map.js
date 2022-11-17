@@ -11,9 +11,9 @@ import {
   GOOGLE_DISTANCE_MATRIX_URL,
   HTTP_STATUS_UNAUTHORIZED,
   CREATE_TRIP_EP,
+  GATEWAY_URL
 } from "../Constants";
 import { mapContext } from "../MapContext";
-import Constants from "expo-constants";
 import { getUserStatus, getUserToken } from "../UserContext";
 import axios from "axios";
 import { map_styles, modal_styles } from "../MapStyles";
@@ -38,8 +38,6 @@ import {
   Pressable,
 } from "react-native";
 
-const localhost = Constants.manifest.extra.localhost;
-const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT;
 
 function tryGetTripPrice(
   token,
@@ -50,7 +48,7 @@ function tryGetTripPrice(
   duration,
   distance
 ) {
-  return axios.get(apiUrl + TRIP_COST_EP, {
+  return axios.get(GATEWAY_URL + TRIP_COST_EP, {
     headers: { Authorization: "Bearer " + token },
     params: {
       src_address: src_street,
@@ -82,9 +80,8 @@ function tryCreateTrip(
   duration,
   distance
 ) {
-  console.log(apiUrl + CREATE_TRIP_EP);
   return axios.post(
-    apiUrl + CREATE_TRIP_EP,
+    GATEWAY_URL + CREATE_TRIP_EP,
     {
       src_address: src_address,
       src_number: src_number,
@@ -222,6 +219,7 @@ function SearchTab() {
                 }
               }
               //FIXME: differentiate error cases here
+              console.log(error)
               Alert.alert("Error", "Could not resolve, try again!");
             }
           }}

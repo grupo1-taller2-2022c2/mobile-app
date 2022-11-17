@@ -9,14 +9,10 @@ import {
 } from "react-native";
 import { styles } from "../../Styles";
 import { getUserStatus, getUserToken } from "../../UserContext";
-import { API_GATEWAY_PORT, DRIVER_ME_EP, HTTP_STATUS_UNAUTHORIZED,HTTP_STATUS_DOESNT_EXIST, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG } from "../../Constants";
-import Constants from "expo-constants";
-
-const localhost = Constants.manifest.extra.localhost;
-const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + DRIVER_ME_EP;
+import { API_GATEWAY_PORT, DRIVER_ME_EP, HTTP_STATUS_UNAUTHORIZED,HTTP_STATUS_DOESNT_EXIST, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, GATEWAY_URL } from "../../Constants";
 
 function tryGetMyProfile(token) {
-  return axios.get(apiUrl, {
+  return axios.get(GATEWAY_URL + DRIVER_ME_EP, {
     headers: { Authorization: "Bearer " + token },
   });
 }

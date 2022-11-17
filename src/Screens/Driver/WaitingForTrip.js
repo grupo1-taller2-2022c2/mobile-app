@@ -1,7 +1,6 @@
 import loadingGif from "../../../assets/loading-gif.gif";
 import { styles } from "../../Styles";
 import { mapContext, MapContextProvider } from "../../MapContext";
-import { GENERIC_ERROR_MSG } from "../../Constants";
 import { getUserStatus, getUserToken } from "../../UserContext";
 import axios from "axios";
 import {
@@ -9,11 +8,14 @@ import {
   TRIPS_EP,
   HTTP_STATUS_OK,
   UPDATE_LOCATION_EP,
+  ASSIGNED_TRIP_EP,
+  GENERIC_ERROR_MSG,
+  GATEWAY_URL,
 } from "../../Constants";
-import Constants from "expo-constants";
 import * as Location from "expo-location";
 import { NavigationContext } from "@react-navigation/native";
 import * as React from "react";
+import { useFocusEffect } from '@react-navigation/native';
 
 import {
   Text,
@@ -28,14 +30,11 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 
-const localhost = Constants.manifest.extra.localhost;
-const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT;
-
 function trySendLocation(token, street_name, street_number) {
-  //console.log("Post to " + apiUrl + UPDATE_LOCATION_EP);
+  //console.log("Post to " + GATEWAY_URL + UPDATE_LOCATION_EP);
 
   return axios.post(
-    apiUrl + UPDATE_LOCATION_EP,
+    GATEWAY_URL + UPDATE_LOCATION_EP,
     {
       street_name: street_name,
       street_num: street_number,
@@ -44,6 +43,12 @@ function trySendLocation(token, street_name, street_number) {
       headers: { Authorization: "Bearer " + token },
     }
   );
+}
+
+function tryCheckIfTripAssigned(token) {
+  return axios.get(GATEWAY_URL + ASSIGNED_TRIP_EP, {
+    headers: { Authorization: "Bearer " + token },
+  });
 }
 
 export default function WaitingForTrip({ route }) {
@@ -67,15 +72,15 @@ export default function WaitingForTrip({ route }) {
       setUserAddress(addresses[0]);
       //console.log(addresses[0]);
 
-      let {street, streetNumber} = addresses[0]
-      await checkIfLocationSent(street,parseInt(streetNumber))
+      let { street, streetNumber } = addresses[0];
+      await checkIfLocationSent(street, parseInt(streetNumber));
     } catch (e) {
       //FIXME: maybe should logout
       console.log(e);
     }
   }
 
-  async function checkIfLocationSent(street,streetNumber) {
+  async function checkIfLocationSent(street, streetNumber) {
     try {
       let userToken = await token.value();
       await trySendLocation(userToken, street, streetNumber);
@@ -105,11 +110,35 @@ export default function WaitingForTrip({ route }) {
 
   useEffect(() => {
     //console.log("Setting up update interval")
-    const interval = setInterval(() => {updateLocation()}, 5000);
+    const interval = setInterval(() => {
+      updateLocation();
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
-
+  useFocusEffect(
+    React.useCallback(() => {
+      const interval = setInterval(() => {
+        console.log("Checking if trip is assigned");
+        const checkIfTripAssigned = async () => {
+          try {
+            let userToken = await token.value();
+            let response = await tryCheckIfTripAssigned(userToken);
+            console.log("Get to " + GATEWAY_URL + ASSIGNED_TRIP_EP);
+            console.log(response)
+            if (response.status === HTTP_STATUS_OK && response.data == true) {
+              navigation.navigate("TripOfferReceived");
+            }
+          } catch (error) {
+            console.log("No trip assigned yet");
+          }
+        };
+  
+        checkIfTripAssigned();
+      }, 5000);
+      return () => clearInterval(interval);
+    }, [])
+  );
 
   return errorMsg ? (
     <View
@@ -132,7 +161,7 @@ export default function WaitingForTrip({ route }) {
       </Text>
 
       <TouchableOpacity
-        style={[styles.button,{backgroundColor: "yellow"}]}
+        style={[styles.button, { backgroundColor: "yellow" }]}
         onPress={() => {
           navigation.navigate("TripOfferReceived");
           console.log("Skipping to TripOfferReceived");

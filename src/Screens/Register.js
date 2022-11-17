@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { styles } from "../Styles";
 import axios from "axios";
-import Constants from "expo-constants";
 import {
   Text,
   View,
@@ -10,10 +9,8 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
-import { API_GATEWAY_PORT, SIGNUP_EP } from "../Constants";
+import { GATEWAY_URL, SIGNUP_EP } from "../Constants";
 
-const localhost = Constants.manifest.extra.localhost;
-const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + SIGNUP_EP;
 
 function verify_password(password, pass_repeat) {
   return password === pass_repeat;
@@ -26,7 +23,7 @@ function alertUserAlreadyExists() {
 }
 
 function trySignUp(email, password, name, surname) {
-  return axios.post(apiUrl, {
+  return axios.post(GATEWAY_URL + SIGNUP_EP, {
     email: email,
     password: password,
     username: name,

@@ -9,22 +9,18 @@ import {
 } from "react-native";
 import { styles } from "../Styles";
 import { getUserStatus, getUserToken } from "../UserContext";
-import { API_GATEWAY_PORT, DRIVER_ME_EP, ME_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG } from "../Constants";
-import Constants from "expo-constants";
+import { API_GATEWAY_PORT, DRIVER_ME_EP, ME_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, GATEWAY_URL } from "../Constants";
 import {updateDriverStatus} from "./Utils";
 
-const localhost = Constants.manifest.extra.localhost;
-const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + ME_EP;
 
 function tryGetMyProfile(token) {
-  return axios.get(apiUrl, {
+  return axios.get(GATEWAY_URL + ME_EP, {
     headers: { Authorization: "Bearer " + token },
   });
 }
 
-const driverUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + DRIVER_ME_EP;
 function checkIfIAmDriver(token) {
-  return axios.get(driverUrl, {
+  return axios.get(GATEWAY_URL + DRIVER_ME_EP, {
     headers: { Authorization: "Bearer " + token },
   });
 }
