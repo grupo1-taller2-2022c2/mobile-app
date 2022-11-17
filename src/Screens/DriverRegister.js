@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { styles } from "../Styles";
 import axios from "axios";
-import Constants from "expo-constants";
 import { getUserStatus, getUserToken } from "../UserContext";
 
 import {
@@ -12,10 +11,7 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
-import { API_GATEWAY_PORT, ADD_VEHICLE_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, HTTP_STATUS_VALID_ERROR, HTTP_STATUS_UNAUTHORIZED } from "../Constants";
-
-const localhost = Constants.manifest.extra.localhost;
-const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT + ADD_VEHICLE_EP;
+import { API_GATEWAY_PORT, ADD_VEHICLE_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, HTTP_STATUS_VALID_ERROR, HTTP_STATUS_UNAUTHORIZED, GATEWAY_URL } from "../Constants";
 
 function alertWrongCredentials() {
   Alert.alert("Please enter valid vehicle credentials!");
@@ -23,7 +19,7 @@ function alertWrongCredentials() {
 
 function tryAddVehicle(licence_plate, model, token) {
   return axios.post(
-    apiUrl,
+    GATEWAY_URL + ADD_VEHICLE_EP,
     {
       licence_plate: licence_plate,
       model: model,

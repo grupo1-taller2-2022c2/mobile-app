@@ -4,8 +4,7 @@ import { mapContext, MapContextProvider } from "../MapContext";
 import { GENERIC_ERROR_MSG } from "../Constants";
 import { getUserStatus, getUserToken } from "../UserContext";
 import axios from "axios";
-import { API_GATEWAY_PORT, TRIPS_EP, HTTP_STATUS_OK } from "../Constants";
-import Constants from "expo-constants";
+import { API_GATEWAY_PORT, TRIPS_EP, HTTP_STATUS_OK, GATEWAY_URL } from "../Constants";
 
 import {
   Text,
@@ -20,12 +19,9 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 
-const localhost = Constants.manifest.extra.localhost;
-const apiUrl = "http://" + localhost + ":" + API_GATEWAY_PORT;
-
 function tryGetTripState(token, tripID) {
-  console.log("Get to " + apiUrl + TRIPS_EP + tripID);
-  return axios.get(apiUrl + TRIPS_EP + tripID, {
+  console.log("Get to " + GATEWAY_URL + TRIPS_EP + tripID);
+  return axios.get(GATEWAY_URL + TRIPS_EP + tripID, {
     headers: { Authorization: "Bearer " + token },
   });
 }

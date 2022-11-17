@@ -8,9 +8,9 @@ import {
   API_GATEWAY_PORT,
   TRIPS_EP,
   HTTP_STATUS_OK,
+  GATEWAY_URL,
   UPDATE_LOCATION_EP,
 } from "../../Constants";
-import Constants from "expo-constants";
 import * as Location from "expo-location";
 import { NavigationContext } from "@react-navigation/native";
 import * as React from "react";
@@ -28,19 +28,50 @@ import {
 import { useEffect, useState } from "react";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
 
-export default function TripOfferReceived() {
+function tryRejectTrip(token, trip_id) {
+  return axios.patch(
+    GATEWAY_URL + TRIPS_EP,
+    {
+      trip_id: trip_id,
+      action: "Deny",
+    },
+    {
+      headers: { Authorization: "Bearer " + token },
+    }
+  );
+}
+
+export default function TripOfferReceived({route}) {
   const userStatus = getUserStatus();
   const token = getUserToken();
   const context = mapContext();
   const navigation = React.useContext(NavigationContext);
 
+  /*const {data} = route.params
+  const passenger_profile = data.passenger_profile
+  const trip_id = data.trip_id*/
   //FIXME: should receive from context or route
+
+  const handleTripRejection = async () => {
+    navigation.navigate("DriverHome")
+
+    try {
+      /*const userToken = token.value()
+      const response = await tryRejectTrip(userToken, trip_id);
+      if (response.status === HTTP_STATUS_OK) {
+        navigation.navigate("DriverHome");
+      } */
+    } catch (error) {
+      console.log(error)
+      Alert.alert(GENERIC_ERROR_MSG);
+      userStatus.signInState.signOut();
+    }
+  }
   const mock_profile = {
     username: "Pasajero",
     surname: "De mentira",
     ratings: 3,
   };
-
   return (
     <View style={[styles.container, { backgroundColor: "#000" }]}>
       <Text style={[styles.text, { margin: 30, fontSize: 30 }]}>
@@ -64,7 +95,7 @@ export default function TripOfferReceived() {
           trailColor = "#3380FF"
           size={240}
           onComplete={() => {
-            navigation.navigate("DriverHome");
+            handleTripRejection()
           }}
         >
           {({ remainingTime }) => (
@@ -99,8 +130,7 @@ export default function TripOfferReceived() {
             { backgroundColor: "dodgerblue", class: "inline", flex: 1 },
           ]}
           onPress={() => {
-            navigation.navigate("DriverHome");
-            //FIXME should add setting self as unavailable in backend
+            handleTripRejection()
           }}
         >
           <Text style={styles.buttonText}>Reject</Text>
