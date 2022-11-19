@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #if permission denied error run
-#$ chmod +x create_trip.sh 
+#$ chmod +x signup_and_create_trip.sh 
 #only env is TOKEN
 
 #signs up and creates trip request
