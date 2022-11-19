@@ -97,7 +97,7 @@ export default function TripOfferReceived({route}) {
           trailColor = "#3380FF"
           size={240}
           onComplete={() => {
-            handleTripRejection()
+            //handleTripRejection()
           }}
         >
           {({ remainingTime }) => (
