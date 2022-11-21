@@ -28,12 +28,12 @@ import {
 import { useEffect, useState } from "react";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
 
-function tryRejectTrip(token, trip_id) {
+function tryAnswerTripOffer(token, trip_id, answer) {
   return axios.patch(
     GATEWAY_URL + TRIPS_EP,
     {
       trip_id: trip_id,
-      action: "Deny",
+      action: answer,
     },
     {
       headers: { Authorization: "Bearer " + token },
@@ -57,16 +57,28 @@ export default function TripOfferReceived({route}) {
 
     try {
       const userToken = await token.value()
-      const response = await tryRejectTrip(userToken, trip_id);
+      const response = await tryAnswerTripOffer(userToken, trip_id, "Deny");
       if (response.status === HTTP_STATUS_OK) {
         navigation.navigate("DriverHome");
       } 
     } catch (error) {
       console.log(error)
-      //FIXME shouldnt navigate anyway
-      navigation.navigate("DriverHome");
-      //Alert.alert(GENERIC_ERROR_MSG);
-      //userStatus.signInState.signOut();
+      Alert.alert(GENERIC_ERROR_MSG);
+      userStatus.signInState.signOut();
+    }
+  }
+
+  const handleTripAcceptance = async () => {
+    try {
+      const userToken = await token.value()
+      const response = await tryAnswerTripOffer(userToken, trip_id, "Accept");
+      if (response.status === HTTP_STATUS_OK) {
+        navigation.navigate("PreTrip");
+      } 
+    } catch (error) {
+      console.log(error)
+      Alert.alert(GENERIC_ERROR_MSG);
+      userStatus.signInState.signOut();
     }
   }
   const mock_profile = {
@@ -97,7 +109,7 @@ export default function TripOfferReceived({route}) {
           trailColor = "#3380FF"
           size={240}
           onComplete={() => {
-            //handleTripRejection()
+            handleTripRejection()
           }}
         >
           {({ remainingTime }) => (
@@ -121,7 +133,7 @@ export default function TripOfferReceived({route}) {
             { backgroundColor: "dodgerblue", class: "inline", flex: 1 },
           ]}
           onPress={() => {
-            navigation.navigate("PreTrip");
+            handleTripAcceptance();
           }}
         >
           <Text style={styles.buttonText}>Accept</Text>
