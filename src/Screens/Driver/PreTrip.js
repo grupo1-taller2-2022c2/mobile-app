@@ -11,7 +11,7 @@ import { styles } from "../../Styles";
 import * as Location from "expo-location";
 
 export default function PreTrip() {
-  const context = mapContext();
+  /*const context = mapContext();
   const userStatus = getUserStatus();
   const token = getUserToken();
   const navigation = React.useContext(NavigationContext);
@@ -46,7 +46,7 @@ export default function PreTrip() {
     destinationInput,
     userAddress,
     tripID,
-  } = context.values;
+  } = context.values;*/
 
   return (
     <View style={styles.myProfile}>
