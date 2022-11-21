@@ -31,8 +31,6 @@ import {
 import { useEffect, useState } from "react";
 
 function trySendLocation(token, street_name, street_number) {
-  //console.log("Post to " + GATEWAY_URL + UPDATE_LOCATION_EP);
-
   return axios.post(
     GATEWAY_URL + UPDATE_LOCATION_EP,
     {
@@ -64,15 +62,19 @@ export default function WaitingForTrip({ route }) {
     try {
       console.log("Updating Location...");
       let location = await Location.getCurrentPositionAsync();
-      setUserLocation(location);
+      setUserLocation(location.coords);
       let addresses = await Location.reverseGeocodeAsync({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       });
-      setUserAddress(addresses[0]);
-      //console.log(addresses[0]);
+      //FIXME: may lead to unmatching location and address
+      if (addresses[0] != null) {
+      setUserAddress(addresses[0])};
+
+      console.log("Location updated to " + location.coords.latitude + ", " + location.coords.longitude);
 
       let { street, streetNumber } = addresses[0];
+      console.log("Sending location " + street + ", " + streetNumber);
       await checkIfLocationSent(street, parseInt(streetNumber));
     } catch (e) {
       //FIXME: maybe should logout
@@ -86,9 +88,10 @@ export default function WaitingForTrip({ route }) {
       await trySendLocation(userToken, street, streetNumber);
       //FIXME: maybe check error cases
     } catch (error) {
-      console.log(error);
-      Alert.alert("Error", GENERIC_ERROR_MSG);
-      userStatus.signInState.signOut();
+      //console.log(error);
+      console.log("error sending location");
+      //Alert.alert("GPS Error", "No current location");
+      //userStatus.signInState.signOut();
     }
   }
 
@@ -159,16 +162,6 @@ export default function WaitingForTrip({ route }) {
       <Text style={[styles.text, { margin: 30, fontSize: 30 }]}>
         Waiting for Trip Offer...
       </Text>
-
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: "yellow" }]}
-        onPress={() => {
-          navigation.navigate("TripOfferReceived");
-          console.log("Skipping to TripOfferReceived");
-        }}
-      >
-        <Text style={styles.buttonText}>Advance to trip offer (dev)</Text>
-      </TouchableOpacity>
     </View>
   );
 }
