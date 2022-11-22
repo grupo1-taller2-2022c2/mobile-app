@@ -58,10 +58,7 @@ export default function DriverTrip({ route }) {
       }}
     >
       <Text style={{ color: "#fff", fontSize: 24 }}>Trip is in Course!</Text>
-      <Text style={{ color: "#fff", fontSize: 24 }}>
-        My current coordinates are {userLocation.latitude},{" "}
-        {userLocation.longitude}
-      </Text>
+
       <Text style={{ color: "#fff", fontSize: 24 }}>
         My current address is {userAddress.street}, {userAddress.streetNumber}
       </Text>
@@ -80,7 +77,7 @@ export default function DriverTrip({ route }) {
               trip_id,
               FINALIZE_TRIP
             );
-            Alert.alert("Trip ended!", "Yay trip ended");
+            navigation.navigate("DriverRating",  {data: {passenger: passenger, trip_id: trip_id} })
           } catch (e) {
             //For later: error code for this is 400
             console.log(e);

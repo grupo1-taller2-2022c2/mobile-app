@@ -23,4 +23,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-/tools
+/tools/driver/logs
+/tools/driver/login_info_driver
+/tools/driver/token.txt
+
+/tools/passenger/logs
+/tools/passenger/login_info_passenger
+/tools/passenger/token.txt
