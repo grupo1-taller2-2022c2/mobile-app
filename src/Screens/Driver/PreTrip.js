@@ -25,7 +25,8 @@ import MapViewDirections from "react-native-maps-directions";
 function tryGetTripInfo(trip_id) {
   return axios.get(GATEWAY_URL + TRIPS_EP + trip_id);
 }
-
+//FIXME esta funcion de momento si la importas de utils no funciona
+//por eso se repite
 async function getCoordsFromAddress(address) {
   let location;
   try {

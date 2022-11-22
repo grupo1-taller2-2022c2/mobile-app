@@ -60,9 +60,9 @@ export default function DriverRating({ route }) {
         ]}
         onPress={async () => {
             try{
-                let userToken = await token.value()
                 console.log(passenger)
-                let response = await tryRatePassenger(userToken, passenger.email, trip_id, rating, null)
+                let userToken = await token.value()
+                let response = await tryRatePassenger(userToken, passenger.email, trip_id, rating, "No message")
                 Alert.alert(
                     "Rating submitted!",
                     "You gave " +
