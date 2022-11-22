@@ -19,6 +19,20 @@ import axios from "axios";
 import { map_styles, modal_styles } from "../MapStyles";
 import { NavigationContext } from "@react-navigation/native";
 
+//FIXME Intente pasarla a utils y exportarla pero si no la dejo aca no anda
+async function getCoordsFromAddress(address) {
+  let location;
+  try {
+    let result = await Location.geocodeAsync(address);
+    if (result.length === 0) {
+      return null;
+    }
+    location = result[0];
+  } catch (error) {
+    return null;
+  }
+  return location;
+}
 const { width, height } = Dimensions.get("window");
 
 const ASPECT_RATIO = width / height;
@@ -97,20 +111,6 @@ function tryCreateTrip(
 
 const mapRef = React.createRef();
 
-async function getCoordsFromAddress(address) {
-  let location;
-  try {
-    let result = await Location.geocodeAsync(address);
-    if (result.length === 0) {
-      return null;
-    }
-    location = result[0];
-  } catch (error) {
-    return null;
-  }
-  return location;
-}
-
 function SearchTab() {
   const context = mapContext();
   const userStatus = getUserStatus();
@@ -157,7 +157,8 @@ function SearchTab() {
               let currentDestAddress = addresses[0];
 
               setDestinationAddress(addresses[0]);
-
+              console.log("ADDRESS")
+              console.log(currentDestAddress)
               let userToken;
               try {
                 userToken = await token.value();

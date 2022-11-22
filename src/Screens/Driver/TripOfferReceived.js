@@ -40,13 +40,16 @@ export default function TripOfferReceived({route}) {
   const [tripAcceptionPending, setTripAcceptionPending] = useState(true);
   //FIXME: maybe receive from context
   const {data} = route.params
-  const {passenger,trip_id} = data
+  let {passenger,trip_id, passenger_email} = data
+  passenger = {...passenger, email: passenger_email}
 
   const handleTripRejection = async () => {
-
+    console.log(passenger)
+    console.log(passenger_data)
     try {
       const userToken = await token.value()
       const response = await tryChangeTripState(userToken, trip_id, DENY_TRIP);
+      
       if (response.status === HTTP_STATUS_OK) {
         await tryDeleteDriverLastLocation(userToken)
         navigation.navigate("DriverHome");
