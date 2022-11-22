@@ -91,6 +91,15 @@ export default function DriverHome({ navigation }) {
       >
         <Text style={styles.buttonText}>Switch to Passenger mode</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, {backgroundColor:"yellow"}]}
+        onPress={() => {
+          navigation.navigate("DriverRating", {data: {passenger: {username: "John", surname: "Doe", ratings: 4.5}, trip_id: 1}});
+        }}
+      >
+        <Text style={styles.buttonText}>Check out Rating Screen (dev)</Text>
+      </TouchableOpacity>
     </View>
   );
 }

@@ -29,16 +29,9 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
-import {tryChangeTripState} from '../Utils'
+import {tryChangeTripState, tryDeleteDriverLastLocation} from '../Utils'
 
-function tryDeleteLastLocation(token) {
-  return axios.delete(
-    GATEWAY_URL + UPDATE_LOCATION_EP +"/",
-    {
-      headers: { Authorization: "Bearer " + token },
-    }
-  );
-}
+
 export default function TripOfferReceived({route}) {
   const userStatus = getUserStatus();
   const token = getUserToken();
@@ -55,7 +48,7 @@ export default function TripOfferReceived({route}) {
       const userToken = await token.value()
       const response = await tryChangeTripState(userToken, trip_id, DENY_TRIP);
       if (response.status === HTTP_STATUS_OK) {
-        await tryDeleteLastLocation(userToken)
+        await tryDeleteDriverLastLocation(userToken)
         navigation.navigate("DriverHome");
       } 
     } catch (error) {

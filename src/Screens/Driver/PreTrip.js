@@ -60,10 +60,7 @@ export default function PreTrip({ route }) {
       }}
     >
       <Text style={{ color: "#fff", fontSize: 24 }}>Welcome to pre trip</Text>
-      <Text style={{ color: "#fff", fontSize: 24 }}>
-        My current coordinates are {userLocation.latitude},{" "}
-        {userLocation.longitude}
-      </Text>
+  
       <Text style={{ color: "#fff", fontSize: 24 }}>
         My current address is {userAddress.street}, {userAddress.streetNumber}
       </Text>

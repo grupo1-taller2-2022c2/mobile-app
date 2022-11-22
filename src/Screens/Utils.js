@@ -2,7 +2,7 @@ import axios from "axios";
 import {
   Alert,
 } from "react-native";
-import { API_GATEWAY_PORT, DRIVER_ME_EP, GATEWAY_URL, TRIPS_EP } from "../Constants";
+import { API_GATEWAY_PORT, DRIVER_ME_EP, GATEWAY_URL, TRIPS_EP,UPDATE_LOCATION_EP } from "../Constants";
 
 function checkIfIAmDriver(token) {
   return axios.get(GATEWAY_URL + DRIVER_ME_EP, {
@@ -37,6 +37,15 @@ export function tryChangeTripState(token, trip_id, new_state) {
       trip_id: trip_id,
       action: new_state,
     },
+    {
+      headers: { Authorization: "Bearer " + token },
+    }
+  );
+}
+
+export function tryDeleteDriverLastLocation(token) {
+  return axios.delete(
+    GATEWAY_URL + UPDATE_LOCATION_EP +"/",
     {
       headers: { Authorization: "Bearer " + token },
     }
