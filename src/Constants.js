@@ -25,5 +25,10 @@ export const USER_ALREADY_EXISTS = 409;
 export const SESSION_EXPIRED_MSG = "Session expired: Please sign in again";
 export const GENERIC_ERROR_MSG = "Something went wrong!";
 
+export const INITIALIZE_TRIP = "Initialize";
+export const DENY_TRIP = "Deny";
+export const ACCEPT_TRIP = "Accept";
+export const FINALIZE_TRIP = "Finalize";
+
 const localhost = Constants.manifest.extra.localhost;
 export const GATEWAY_URL = "http://" + localhost + ":" + API_GATEWAY_PORT;

@@ -10,6 +10,8 @@ import {
   HTTP_STATUS_OK,
   GATEWAY_URL,
   UPDATE_LOCATION_EP,
+  DENY_TRIP,
+  ACCEPT_TRIP
 } from "../../Constants";
 import * as Location from "expo-location";
 import { NavigationContext } from "@react-navigation/native";
@@ -27,38 +29,33 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
+import {tryChangeTripState} from '../Utils'
 
-function tryAnswerTripOffer(token, trip_id, answer) {
-  return axios.patch(
-    GATEWAY_URL + TRIPS_EP,
-    {
-      trip_id: trip_id,
-      action: answer,
-    },
+function tryDeleteLastLocation(token) {
+  return axios.delete(
+    GATEWAY_URL + UPDATE_LOCATION_EP +"/",
     {
       headers: { Authorization: "Bearer " + token },
     }
   );
 }
-
 export default function TripOfferReceived({route}) {
   const userStatus = getUserStatus();
   const token = getUserToken();
   const context = mapContext();
   const navigation = React.useContext(NavigationContext);
-
+  const [tripAcceptionPending, setTripAcceptionPending] = useState(true);
+  //FIXME: maybe receive from context
   const {data} = route.params
-  //Fixme: to be done from backend
-  //const passenger_profile = data.passenger_profile
-  const trip_id = data
-  //FIXME: should receive from context or route
+  const {passenger,trip_id} = data
 
   const handleTripRejection = async () => {
 
     try {
       const userToken = await token.value()
-      const response = await tryAnswerTripOffer(userToken, trip_id, "Deny");
+      const response = await tryChangeTripState(userToken, trip_id, DENY_TRIP);
       if (response.status === HTTP_STATUS_OK) {
+        await tryDeleteLastLocation(userToken)
         navigation.navigate("DriverHome");
       } 
     } catch (error) {
@@ -71,9 +68,9 @@ export default function TripOfferReceived({route}) {
   const handleTripAcceptance = async () => {
     try {
       const userToken = await token.value()
-      const response = await tryAnswerTripOffer(userToken, trip_id, "Accept");
+      const response = await tryChangeTripState(userToken, trip_id, ACCEPT_TRIP);
       if (response.status === HTTP_STATUS_OK) {
-        navigation.navigate("PreTrip");
+        navigation.navigate("PreTrip",{ data: {passenger: passenger, trip_id: trip_id} });
       } 
     } catch (error) {
       console.log(error)
@@ -81,11 +78,11 @@ export default function TripOfferReceived({route}) {
       userStatus.signInState.signOut();
     }
   }
-  const mock_profile = {
+  /*const mock_profile = {
     username: "Pasajero",
     surname: "De mentira",
     ratings: 3,
-  };
+  };*/
   return (
     <View style={[styles.container, { backgroundColor: "#000" }]}>
       <Text style={[styles.text, { margin: 30, fontSize: 30 }]}>
@@ -95,9 +92,9 @@ export default function TripOfferReceived({route}) {
         Passenger details:
       </Text>
       <Text style={[styles.text, { margin: 30, fontSize: 20 }]}>
-        Name: {mock_profile.username}
-        {"\n"}Surname: {mock_profile.surname}
-        {"\n"}Ratings:{mock_profile.ratings}/5
+        Name: {passenger.username}
+        {"\n"}Surname: {passenger.surname}
+        {"\n"}Ratings:{passenger.ratings}/5
       </Text>
 
       <View style={{ justifyContent: "center", flexDirection: "row", marginTop: 30 }}>
@@ -109,7 +106,8 @@ export default function TripOfferReceived({route}) {
           trailColor = "#3380FF"
           size={240}
           onComplete={() => {
-            handleTripRejection()
+            if (tripAcceptionPending){
+              handleTripRejection()}
           }}
         >
           {({ remainingTime }) => (
@@ -133,6 +131,7 @@ export default function TripOfferReceived({route}) {
             { backgroundColor: "dodgerblue", class: "inline", flex: 1 },
           ]}
           onPress={() => {
+            setTripAcceptionPending(false)
             handleTripAcceptance();
           }}
         >
@@ -144,6 +143,7 @@ export default function TripOfferReceived({route}) {
             { backgroundColor: "dodgerblue", class: "inline", flex: 1 },
           ]}
           onPress={() => {
+            setTripAcceptionPending(false)
             handleTripRejection()
           }}
         >

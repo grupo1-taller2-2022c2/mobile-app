@@ -9,7 +9,7 @@ export function mapContext() {
 export function MapContextProvider({ children }) {
   const [destinationInput, onChangeDestinationInput] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
-  const [userAddress, setUserAddress] = useState(null);
+  const [userAddress, setUserAddress] = useState({street: null, streetNumber: null});
   const [destinationCoords, setDestinationCoords] = useState(null);
   const [destinationAddress, setDestinationAddress] = useState(null);
   const [tripModalVisible, setTripModalVisible] = useState(false);
