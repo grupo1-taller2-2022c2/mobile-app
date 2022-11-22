@@ -8,38 +8,36 @@ import {
   Image,
 } from "react-native";
 import { styles } from "../../Styles";
-import * as Location from "expo-location";
-import { useFocusEffect } from "@react-navigation/native";
 import { mapContext } from "../../MapContext";
 import { getUserStatus, getUserToken } from "../../UserContext";
 import { NavigationContext } from "@react-navigation/native";
 import * as React from "react";
-import { TRIPS_EP, GATEWAY_URL, INITIALIZE_TRIP } from "../../Constants";
+import { TRIPS_EP, GATEWAY_URL, FINALIZE_TRIP } from "../../Constants";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import {tryChangeTripState} from '../Utils'
+import { tryChangeTripState } from "../Utils";
 
 function tryGetTripInfo(trip_id) {
   return axios.get(GATEWAY_URL + TRIPS_EP + trip_id);
 }
 
-export default function PreTrip({ route }) {
-  const [srcStreet, setSrcStreet] = useState("");
-  const [srcStreetNumber, setSrcStreetNumber] = useState("");
+export default function DriverTrip({ route }) {
+  const [dstStreet, setDstStreet] = useState("");
+  const [dstStreetNumber, setDstStreetNumber] = useState("");
 
   useEffect(() => {
     (async () => {
       try {
         let response = await tryGetTripInfo(trip_id);
-        let {src_address, src_number} = response.data
-        setSrcStreet(src_address)
-        setSrcStreetNumber(src_number)
+        let { dst_address, dst_number } = response.data;
+        setDstStreet(dst_address);
+        setDstStreetNumber(dst_number);
       } catch (e) {
         console.log(e);
       }
     })();
-  },[]);
-  //FIXME: what happens if get to passenger address fails?
+  }, []);
+
   const context = mapContext();
   const userStatus = getUserStatus();
   const token = getUserToken();
@@ -59,7 +57,7 @@ export default function PreTrip({ route }) {
         alignItems: "center",
       }}
     >
-      <Text style={{ color: "#fff", fontSize: 24 }}>Welcome to pre trip</Text>
+      <Text style={{ color: "#fff", fontSize: 24 }}>Trip is in Course!</Text>
       <Text style={{ color: "#fff", fontSize: 24 }}>
         My current coordinates are {userLocation.latitude},{" "}
         {userLocation.longitude}
@@ -69,27 +67,32 @@ export default function PreTrip({ route }) {
       </Text>
 
       <Text style={{ color: "#fff", fontSize: 24 }}>
-        My passenger is at {srcStreet}, {srcStreetNumber}
+        My destination is at {dstStreet}, {dstStreetNumber}
       </Text>
 
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: "yellow", padding: 20 }]}
-          onPress={async () => {
-            try{
-              let userToken = await token.value()
-              let response = await tryChangeTripState(userToken,trip_id, INITIALIZE_TRIP)
-              navigation.navigate("DriverTrip",  {data: {passenger: passenger, trip_id: trip_id} });
-            }
-            catch(e){
-              //For later: error code for this is 400
-              console.log(e)
-              Alert.alert("Can't start trip", "Please get close to the passenger and pick them up!")
-            }
-          }}
-        >
-          <Text style={styles.buttonText}>Start Trip</Text>
-        </TouchableOpacity>
-
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: "yellow", padding: 20 }]}
+        onPress={async () => {
+          try {
+            let userToken = await token.value();
+            let response = await tryChangeTripState(
+              userToken,
+              trip_id,
+              FINALIZE_TRIP
+            );
+            Alert.alert("Trip ended!", "Yay trip ended");
+          } catch (e) {
+            //For later: error code for this is 400
+            console.log(e);
+            Alert.alert(
+              "Can't end trip",
+              "Please get close to the destination and drop off the passenger!"
+            );
+          }
+        }}
+      >
+        <Text style={styles.buttonText}>Finish Trip</Text>
+      </TouchableOpacity>
     </View>
   );
 }

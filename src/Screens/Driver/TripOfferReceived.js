@@ -10,6 +10,8 @@ import {
   HTTP_STATUS_OK,
   GATEWAY_URL,
   UPDATE_LOCATION_EP,
+  DENY_TRIP,
+  ACCEPT_TRIP
 } from "../../Constants";
 import * as Location from "expo-location";
 import { NavigationContext } from "@react-navigation/native";
@@ -27,21 +29,8 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
+import {tryChangeTripState} from '../Utils'
 
-function tryAnswerTripOffer(token, trip_id, answer) {
-  console.log("Answer is: " + answer);
-  console.log("Trip id is: " + trip_id);
-  return axios.patch(
-    GATEWAY_URL + TRIPS_EP,
-    {
-      trip_id: trip_id,
-      action: answer,
-    },
-    {
-      headers: { Authorization: "Bearer " + token },
-    }
-  );
-}
 function tryDeleteLastLocation(token) {
   return axios.delete(
     GATEWAY_URL + UPDATE_LOCATION_EP +"/",
@@ -64,7 +53,7 @@ export default function TripOfferReceived({route}) {
 
     try {
       const userToken = await token.value()
-      const response = await tryAnswerTripOffer(userToken, trip_id, "Deny");
+      const response = await tryChangeTripState(userToken, trip_id, DENY_TRIP);
       if (response.status === HTTP_STATUS_OK) {
         await tryDeleteLastLocation(userToken)
         navigation.navigate("DriverHome");
@@ -79,7 +68,7 @@ export default function TripOfferReceived({route}) {
   const handleTripAcceptance = async () => {
     try {
       const userToken = await token.value()
-      const response = await tryAnswerTripOffer(userToken, trip_id, "Accept");
+      const response = await tryChangeTripState(userToken, trip_id, ACCEPT_TRIP);
       if (response.status === HTTP_STATUS_OK) {
         navigation.navigate("PreTrip",{ data: {passenger: passenger, trip_id: trip_id} });
       } 
