@@ -19,6 +19,8 @@ import DriverRegister from "./Screens/DriverRegister";
 import DriverHome from "./Screens/Driver/DriverHome";
 import DriverMyProfile from "./Screens/Driver/DriverMyProfile";
 import WaitingForDriver from "./Screens/WaitingForDriver";
+import WaitingForTripToEnd from "./Screens/WaitingForTripToEnd";
+import RateTrip from "./Screens/RateTrip";
 import WaitingForTrip from "./Screens/Driver/WaitingForTrip";
 import TripOfferReceived from "./Screens/Driver/TripOfferReceived";
 import PreTrip from "./Screens/Driver/PreTrip";
@@ -89,6 +91,16 @@ export function NavigationStack() {
               name="WaitingForDriver"
               component={WaitingForDriver}
               options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="WaitingForTripToEnd"
+                component={WaitingForTripToEnd}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="RateTrip"
+                component={RateTrip}
+                options={{ headerShown: false }}
             />
             <Stack.Screen
               name="DriverRegistration"
