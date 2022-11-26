@@ -261,7 +261,8 @@ function MyMapView() {
   useEffect(() => {
     if (incomingNavigation) {
       navigation.navigate("WaitingForDriver", {
-        assignedDriver: assignedDriver, tripID: tripID,
+        assignedDriver: assignedDriver, tripID: tripID, sourceCoords : userLocation.coords,
+        destinationCoords: destinationCoords
       });
     }
   }, [incomingNavigation]);

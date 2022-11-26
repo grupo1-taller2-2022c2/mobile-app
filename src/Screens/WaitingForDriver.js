@@ -38,6 +38,8 @@ export default function WaitingForDriver({ route }) {
   let data = route.params;
   let driver = data.assignedDriver;
   let tripID = data.tripID;
+  let sourceCoords = data.sourceCoords;
+  let destinationCoords = data.destinationCoords;
 
   async function isTripAccepted(tripID) {
     try {
@@ -54,7 +56,8 @@ export default function WaitingForDriver({ route }) {
         }
         else if (response.data.state === "In course" ||
             response.data.state === "Completed") {
-          navigation.replace("WaitingForTripToEnd", { data: response.data, asignedDriver: driver });
+          navigation.replace("WaitingForTripToEnd", { data: response.data, asignedDriver: driver,
+            sourceCoords: sourceCoords, destinationCoords: destinationCoords });
         }
       }
     } catch (error) {
