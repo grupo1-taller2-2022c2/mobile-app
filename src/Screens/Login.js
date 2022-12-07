@@ -12,10 +12,12 @@ import {
   Button,
 } from "react-native";
 import { getUserStatus, getUserToken } from "../UserContext";
-import { auth, provider, GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+import { auth, provider } from "../firebase";
+import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import * as WebBrowser from 'expo-web-browser';
 import { ResponseType } from 'expo-auth-session';
 import * as Google from 'expo-auth-session/providers/google';
+// import { Constants, Google } from 'expo';
 
 function alertWrongCredentials() {
   Alert.alert("Wrong Credentials!");
@@ -55,11 +57,11 @@ function trySignIn(email, password) {
 //       // ...
 //     });
 // }
-
 // const trySignInWithGoogle = async function() {
 //   try {
 //     console.log("aqui1")
 //     const result = await Expo.Google.logInAsync({
+//       expoClientId: "82078037515-an42c8jkkm2c9gdp5s6gjgta54s2paql.apps.googleusercontent.com",
 //       androidClientId:"82078037515-rqu7r5e6ki8ocor99ikp8rq9oin3spgt.apps.googleusercontent.com",
 //       iosClientId:"82078037515-3fjl0cd7mqa3njb7t2of1d2ev3uc8mou.apps.googleusercontent.com"
 //     });
@@ -101,9 +103,19 @@ export default function Login({ navigation }) {
 
   React.useEffect(() => {
     if (response?.type === 'success') {
+      console.log(response.params)
       const { id_token } = response.params;
       const credential = GoogleAuthProvider.credential(id_token);
-      signInWithCredential(auth, credential);
+      console.log("credential")
+      console.log(credential)
+      console.log(auth)
+      signInWithCredential(auth, credential).then(res => {
+          // user res, create your user, do whatever you want
+          console.log(res)
+        })
+        .catch(error => {
+          console.log("firebase cred err:", error);
+        });
     }
   }, [response]);
 
@@ -149,7 +161,7 @@ export default function Login({ navigation }) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-            promptAsync()// trySignInWithGoogle() 
+            promptAsync() // trySignInWithGoogle() 
             .then((response) => {
               console.log("Got response at Sign In with Google!")
               // let token_data = response.data["access_token"];
