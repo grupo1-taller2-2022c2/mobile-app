@@ -34,20 +34,23 @@ function trySignIn(email, password) {
 }
 
 function tryGoogleSignUpIfNew(access_token) {
-  return axios.post(
-    GATEWAY_URL + GOOGLE_SIGNUP_IF_NEW_EP, {
+  console.log(access_token)
+  axios.post(
+    GATEWAY_URL + GOOGLE_SIGNUP_IF_NEW_EP, {}, {
 			headers: {
-				Authorization: 'Bearer ' + access_token,
+				'token': access_token,
 			},
     })
     .then((res) => {
-      console.log(res)
+      // El usuario se registró porque era nuevo. No hacer nada, supongo
+      console.log("The user was new to the app and was registered")
     })
     .catch((err) => {
-      console.log(err)
+      if (err.response.status == 409){
+        console.log(err.response.data)
+      }
     });
 }
-
 
 export default function Login({ navigation }) {
   const [email, onChangeEmail] = useState(null);
@@ -78,7 +81,7 @@ export default function Login({ navigation }) {
         }
         )
         .catch(error => {
-          console.log("firebase cred err:", error);
+          console.log("firebase credentials error:", error);
         });
     }
   }, [response]);
