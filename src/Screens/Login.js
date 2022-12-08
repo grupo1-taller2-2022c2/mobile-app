@@ -48,6 +48,8 @@ function tryGoogleSignUpIfNew(access_token) {
     .catch((err) => {
       if (err.response.status == 409){
         console.log(err.response.data)
+      } else {
+        console.log("An error occurred while trying to register user that loged in with Google")
       }
     });
 }
@@ -136,7 +138,7 @@ export default function Login({ navigation }) {
               userStatus.signInState.signIn();
             })
             .catch((e) => {
-              console.log("Did not get response at Sign In with Google")
+              console.log("Could not Sign In with Google")
               alertWrongCredentials();
             });
         }}
