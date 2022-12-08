@@ -75,6 +75,7 @@ export default function Login({ navigation }) {
       signInWithCredential(auth, credential).then(res => {
           res.user.getIdTokenResult().then(
             id_toke_res => {
+              token.set(id_toke_res.token)
               tryGoogleSignUpIfNew(id_toke_res.token)
             }
           )
@@ -128,12 +129,11 @@ export default function Login({ navigation }) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-            promptAsync() // trySignInWithGoogle() 
+            promptAsync() 
             .then((response) => {
               console.log("Got response at Sign In with Google!")
-              // let token_data = response.data["access_token"];
-              // token.set(token_data);
-              // userStatus.signInState.signIn();
+              // Ya seteamos el token en el useEffect
+              userStatus.signInState.signIn();
             })
             .catch((e) => {
               console.log("Did not get response at Sign In with Google")
