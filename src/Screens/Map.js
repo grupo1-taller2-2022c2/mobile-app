@@ -192,7 +192,8 @@ function SearchTab() {
                 distance.value
               );
 
-              let tripPrice = Math.round(tripPriceResponse.data.price);
+              console.log(tripPriceResponse.data.price)
+              let tripPrice = Number(tripPriceResponse.data.price.toFixed(6));
               console.log("Estimated price: " + tripPrice);
               setEstimatedTripPrice(tripPrice);
 
@@ -305,7 +306,7 @@ function MyMapView() {
           <View style={modal_styles.centeredView}>
             <View style={modal_styles.modalView}>
               <Text style={modal_styles.modalText}>
-                Estimated Trip Price is ${context.values.estimatedTripPrice}.{" "}
+                Estimated Trip Price is {context.values.estimatedTripPrice} ETH.{" "}
                 {"\n"}Do you want to start a search for a driver to go to this
                 destination?
               </Text>
