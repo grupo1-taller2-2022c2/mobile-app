@@ -49,7 +49,7 @@ function tryGoogleSignUpIfNew(access_token) {
       if (err.response.status == 409){
         console.log(err.response.data)
       } else {
-        console.log("An error occurred while trying to register user that loged in with Google")
+        console.log("An error occurred while trying to register user that logged in with Google: " + err.response.data)
       }
     });
 }
@@ -86,6 +86,8 @@ export default function Login({ navigation }) {
         .catch(error => {
           console.log("firebase credentials error:", error);
         });
+        userStatus.signInState.signIn();
+        console.log("Logged in!")
     }
   }, [response]);
 
@@ -134,8 +136,7 @@ export default function Login({ navigation }) {
             promptAsync() 
             .then((response) => {
               console.log("Got response at Sign In with Google!")
-              // Ya seteamos el token en el useEffect
-              userStatus.signInState.signIn();
+              // Ya seteamos el token en el useEffect y logueamos si todo es exitoso
             })
             .catch((e) => {
               console.log("Could not Sign In with Google")
