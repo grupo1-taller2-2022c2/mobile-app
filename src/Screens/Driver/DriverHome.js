@@ -73,7 +73,32 @@ export default function DriverHome({ navigation }) {
       >
         <Text style={styles.buttonText}>My Profile</Text>
       </TouchableOpacity>
-
+        <TouchableOpacity // Esto es horrible. Despues le metemos un useState con el profile o algo asi
+            style={styles.button}
+            onPress={() => {
+                token
+                    .value()
+                    .catch((e) => {
+                        console.log("Token not found");
+                        Alert.alert("Something went wrong!");
+                        userStatus.signInState.signOut();
+                    })
+                    .then((token) => {
+                        return tryGetMyProfile(token);
+                    })
+                    .then((response) => {
+                        navigation.navigate("WalletDriver", { data: response.data });
+                    })
+                    .catch((e) => {
+                        console.log(e);
+                        //FIXME: is this truly the only error case?
+                        Alert.alert(SESSION_EXPIRED_MSG);
+                        userStatus.signInState.signOut();
+                    });
+            }}
+        >
+            <Text style={styles.buttonText}>See or Withdraw funds</Text>
+        </TouchableOpacity>
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
