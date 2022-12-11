@@ -91,11 +91,13 @@ export default function WalletDriver({route}) {
                                         const errCode = (e.response.data.detail)? JSON.parse(e.response.data.detail).code : "unexpectedError";
                                         console.log(e.response.data);
                                         if (errCode === "INVALID_ARGUMENT") {
-                                            Alert.alert(`The wallet ${externalWallet} does not exist! You just threw your coins away!`);
+                                            Alert.alert(`The wallet ${externalWallet} does not exist!`, `You just threw your coins away!`);
                                         } else if (errCode === "INSUFFICIENT_FUNDS") {
-                                            Alert.alert("Not enough funds! Remember ETH transactions have gas prices!");
+                                            Alert.alert("Not enough funds!", "Remember ETH transactions have gas prices!");
+                                        } else if (errCode === "UNPREDICTABLE_GAS_LIMIT") {
+                                            Alert.alert("Couldn't predict gas limit", "Maybe try a lower withdrawal!");
                                         } else {
-                                            Alert.alert(`Unexpected error code: ${e.response.status}`);
+                                            Alert.alert(`Unexpected error code: ${e.response.status}`, `${e.response.data.message}`);
                                         }
                                         refreshWallet();
                                     });
