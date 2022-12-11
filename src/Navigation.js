@@ -15,6 +15,7 @@ import Login from "./Screens/Login";
 import Register from "./Screens/Register";
 import MyProfile from "./Screens/MyProfile";
 import Map from "./Screens/Map";
+import Wallet from "./Screens/Wallet"
 import DriverRegister from "./Screens/DriverRegister";
 import DriverHome from "./Screens/Driver/DriverHome";
 import DriverMyProfile from "./Screens/Driver/DriverMyProfile";
@@ -26,6 +27,7 @@ import TripOfferReceived from "./Screens/Driver/TripOfferReceived";
 import PreTrip from "./Screens/Driver/PreTrip";
 import DriverTrip from "./Screens/Driver/DriverTrip";
 import DriverRating from "./Screens/Driver/DriverRating";
+import WalletDriver from "./Screens/Driver/WalletDriver";
 
 export function NavigationStack() {
   const userStatus = getUserStatus();
@@ -43,6 +45,11 @@ export function NavigationStack() {
               name="DriverMyProfile"
               component={DriverMyProfile}
               options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="WalletDriver"
+                component={WalletDriver}
+                options={{ headerShown: false }}
             />
             <Stack.Screen
               name="WaitingForTrip"
@@ -106,6 +113,11 @@ export function NavigationStack() {
               name="DriverRegistration"
               component={DriverRegister}
               options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="Wallet"
+                component={Wallet}
+                options={{ headerShown: false }}
             />
           </>
         )
