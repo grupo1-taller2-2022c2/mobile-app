@@ -13,7 +13,7 @@ import {
     const {data} = route.params;
     return (
       <View style={styles.myProfile}>
-        <Image source={profilePicture} style={{height: 200, width:200, resizeMode: "contain"}}/>
+        <Image source={{uri: data.photo}} style={{height: 200, width:200, resizeMode: "contain"}}/>
         <View style={{marginTop: 20}}>
         <Text style={{ color: "#fff", fontSize: 24 }}>Email Address: {data.email}</Text>
         <Text style={{ color: "#fff", fontSize: 24 }}>Name: {data.username} {data.surname}</Text>

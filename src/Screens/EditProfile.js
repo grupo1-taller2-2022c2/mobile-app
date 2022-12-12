@@ -12,10 +12,9 @@ import {
     TouchableOpacity,
     Button, Image,
 } from "react-native";
-import {EDIT_PROF_EP, GATEWAY_URL, SESSION_EXPIRED_MSG} from "../Constants";
+import {EDIT_PROF_EP, GATEWAY_URL, SESSION_EXPIRED_MSG, UPLOAD_PIC_PAS} from "../Constants";
 import {getUserStatus, getUserToken} from "../UserContext";
 import profilePicture from "../../assets/user-placeholder.png";
-
 
 function tryEditProfile(name, surname, token) {
     return axios.patch(GATEWAY_URL + EDIT_PROF_EP, {
@@ -28,45 +27,54 @@ function tryEditProfile(name, surname, token) {
     });
 }
 
-function PickAnImage() {
-    const [image, setImage] = useState(null);
-
-    const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [3, 3],
-            quality: 1,
-        });
-        if (!result.cancelled) {
-            setImage(result.uri);
+function tryUploadPicture(picture, token) {
+    const form = new FormData();
+    form.append('photo', {name: 'media', uri: picture, type: "image/jpg" });
+    return axios.post(GATEWAY_URL + UPLOAD_PIC_PAS,
+        form,
+        {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'multipart/form-data',
+                Authorization: "Bearer " + token
         }
-    };
-
-    return (
-        <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-            {image && <Image source={{ uri: image }} style={{ width: 200, height: 200, resizeMode: "contain"}} />}
-            {!image && <Image source={profilePicture} style={{height: 200, width:200, resizeMode: "contain"}}/>}
-            <Text>{"\n"}</Text>
-            <Button title="Pick an image" onPress={pickImage} />
-        </View>
-    );
+    })
 }
+
 
 export default function EditProfile({route, navigation}) {
     const {data} = route.params;
     const [name, onChangeName] = useState(data.username);
     const [surname, onChangeSurname] = useState(data.surname);
+    const [image, setImage] = useState(null);
 
     const token = getUserToken();
     const userStatus = getUserStatus();
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [3, 3],
+            quality: 1,
+            // base64: true
+        });
+        if (!result.cancelled) {
+            setImage(result);
+        }
+    };
 
     return (
         <View style={styles.container}>
             <Text style={[styles.title, { fontSize: 15 }]}>
                 Please, enter your new profile information!
             </Text>
-            <PickAnImage/>
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                {image && <Image source={{ uri: image.uri }} style={{ width: 200, height: 200, resizeMode: "contain"}} />}
+                {!image && <Image source={{uri: data.photo}} style={{height: 200, width:200, resizeMode: "contain"}}/>}
+                <Text>{"\n"}</Text>
+                <Button title="Pick an image" onPress={pickImage} />
+            </View>
             <Text>{"\n"}</Text>
             <TextInput
                 style={styles.input}
@@ -85,29 +93,42 @@ export default function EditProfile({route, navigation}) {
             <TouchableOpacity
                 style={[styles.button, { backgroundColor: "dodgerblue" }]}
                 onPress={() => {
-                    token
-                        .value()
-                        .catch((e) => {
-                            console.log("Token not found");
-                            Alert.alert("Something went wrong!");
-                            userStatus.signInState.signOut();
-                        })
-                        .then((token) => {
-                            return tryEditProfile(name, surname, token);
-                        })
-                        .then(() => {
-                            Alert.alert("Successful profile change!");
-                            data.username = name;
-                            data.surname = surname;
-                            navigation.navigate("MyProfile", {data: data});
-                        })
-                        .catch((e) => {
-                            console.log(e);
-                            //FIXME: is this truly the only error case?
-                            Alert.alert(SESSION_EXPIRED_MSG);
-                            userStatus.signInState.signOut();
-                        });
-                }}
+                        var imageErrorMessage = ""; // React native me fuerza la mano, porque no permite stackear alerts
+                        token
+                            .value()
+                            .catch((e) => {
+                                console.log("Token not found");
+                                Alert.alert("Something went wrong!");
+                                userStatus.signInState.signOut();
+                            })
+                            .then((token) => {
+                                if (image) {
+                                    tryUploadPicture(image.uri, token).then(
+                                        () => data.photo = image.uri
+                                    ).catch(
+                                        (e) => {
+                                            console.log(e);
+                                            console.log(e.response.data);
+                                            imageErrorMessage = `But we couldn't upload your picture! ERROR ${e.response.status}: ${(e.response.data)? JSON.stringify(e.response.data): "Completely unexpected error" }`
+                                        }
+                                    )
+                                }
+                                return tryEditProfile(name, surname, token);
+                            })
+                            .then(() => {
+                                Alert.alert("Successful profile change!", imageErrorMessage);
+                                data.username = name;
+                                data.surname = surname;
+                                navigation.navigate("MyProfile", {data: data});
+                            })
+                            .catch((e) => {
+                                console.log(e);
+                                //FIXME: is this truly the only error case?
+                                Alert.alert(SESSION_EXPIRED_MSG);
+                                userStatus.signInState.signOut();
+                            });
+                        }
+            }
             >
                 <Text style={styles.buttonText}>Update Profile</Text>
             </TouchableOpacity>

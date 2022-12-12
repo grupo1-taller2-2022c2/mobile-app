@@ -21,7 +21,8 @@ export const WALLETS_URI = "/wallet/"
 export const WALLET_WITHDRAWAL_URI = "/wallet/withdrawals/"
 export const EDIT_PROF_EP = "/passengers/";
 export const EDIT_DRIVER_PROF_EP = "/drivers/";
-
+export const UPLOAD_PIC_PAS = "/passengers/picture";
+export const UPLOAD_PIC_DRIVER = "/drivers/picture";
 
 export const GOOGLE_MAPS_APIKEY = "AIzaSyD3H-dhvbdSHcltS1cJQp10oty-xO9faPE";
 export const GOOGLE_DISTANCE_MATRIX_URL = "https://maps.googleapis.com/maps/api/distancematrix/json"
