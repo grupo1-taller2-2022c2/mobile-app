@@ -1,19 +1,10 @@
 {
     "build": {
-      "preview": {
-        "android": {
-          "buildType": "apk"
-        }
-      },
-      "preview2": {
-        "android": {
-          "gradleCommand": ":app:assembleRelease"
-        }
-      },
-      "preview3": {
-        "developmentClient": true
-      },
       "production": {
+        "android": {
+          "buildType": "apk",
+          "gradleCommand": ":app:assembleRelease"
+        },
         "env": {
           "GATEWAY_URL": "https://fi-uber-api-gateway.herokuapp.com"
         }
