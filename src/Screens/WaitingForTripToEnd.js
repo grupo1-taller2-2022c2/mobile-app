@@ -4,7 +4,7 @@ import {GENERIC_ERROR_MSG, GOOGLE_MAPS_APIKEY} from "../Constants";
 import { getUserStatus, getUserToken } from "../UserContext";
 import axios from "axios";
 import * as React from "react";
-import { API_GATEWAY_PORT, TRIPS_EP, HTTP_STATUS_OK, GATEWAY_URL } from "../Constants";
+import { TRIPS_EP, HTTP_STATUS_OK, GATEWAY_URL } from "../Constants";
 import * as Location from "expo-location";
 import ainsley from "../../assets/ainsley.png";
 

@@ -2,7 +2,7 @@ import axios from "axios";
 import {
   Alert,
 } from "react-native";
-import { API_GATEWAY_PORT, DRIVER_ME_EP, GATEWAY_URL, TRIPS_EP,UPDATE_LOCATION_EP } from "../Constants";
+import { DRIVER_ME_EP, GATEWAY_URL, TRIPS_EP,UPDATE_LOCATION_EP } from "../Constants";
 
 function checkIfIAmDriver(token) {
   return axios.get(GATEWAY_URL + DRIVER_ME_EP, {

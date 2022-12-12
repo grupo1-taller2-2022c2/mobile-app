@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
-import { API_GATEWAY_PORT, ADD_VEHICLE_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, HTTP_STATUS_VALID_ERROR, HTTP_STATUS_UNAUTHORIZED, GATEWAY_URL } from "../Constants";
+import { ADD_VEHICLE_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, HTTP_STATUS_VALID_ERROR, HTTP_STATUS_UNAUTHORIZED, GATEWAY_URL } from "../Constants";
 
 function alertWrongCredentials() {
   Alert.alert("Please enter valid vehicle credentials!");

@@ -5,7 +5,7 @@ import { GENERIC_ERROR_MSG } from "../Constants";
 import { getUserStatus, getUserToken } from "../UserContext";
 import axios from "axios";
 import * as React from "react";
-import { API_GATEWAY_PORT, TRIPS_EP, HTTP_STATUS_OK, GATEWAY_URL } from "../Constants";
+import { TRIPS_EP, HTTP_STATUS_OK, GATEWAY_URL } from "../Constants";
 
 import {
   Text,

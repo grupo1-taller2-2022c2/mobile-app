@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { styles } from "../Styles";
 import axios from "axios";
 import qs from "qs";
-import { API_GATEWAY_PORT, SIGNIN_EP, GATEWAY_URL, GOOGLE_SIGNUP_IF_NEW_EP } from "../Constants";
+import { SIGNIN_EP, GATEWAY_URL, GOOGLE_SIGNUP_IF_NEW_EP } from "../Constants";
 import {
   Text,
   View,

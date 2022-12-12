@@ -4,7 +4,6 @@ import { mapContext, MapContextProvider } from "../../MapContext";
 import { getUserStatus, getUserToken } from "../../UserContext";
 import axios from "axios";
 import {
-  API_GATEWAY_PORT,
   TRIPS_EP,
   HTTP_STATUS_OK,
   UPDATE_LOCATION_EP,

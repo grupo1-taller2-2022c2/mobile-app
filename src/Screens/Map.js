@@ -6,7 +6,6 @@ import MapViewDirections from "react-native-maps-directions";
 import {
   GOOGLE_MAPS_APIKEY,
   TRIP_COST_EP,
-  API_GATEWAY_PORT,
   SESSION_EXPIRED_MSG,
   GOOGLE_DISTANCE_MATRIX_URL,
   HTTP_STATUS_UNAUTHORIZED,

@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { styles } from "../Styles";
 import { getUserStatus, getUserToken } from "../UserContext";
-import { API_GATEWAY_PORT, DRIVER_ME_EP, ME_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, GATEWAY_URL, NOTIF_TOKEN_EP } from "../Constants";
+import { DRIVER_ME_EP, ME_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, GATEWAY_URL, NOTIF_TOKEN_EP } from "../Constants";
 import {updateDriverStatus} from "./Utils";
 
 

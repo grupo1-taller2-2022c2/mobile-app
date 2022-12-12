@@ -1,6 +1,5 @@
 import Constants from "expo-constants";
 
-export const API_GATEWAY_PORT = "3005";
 export const SIGNIN_EP = "/token";
 export const SIGNUP_EP = "/users/signup";
 export const GOOGLE_SIGNUP_IF_NEW_EP = "/users/google_sign_up_if_new";
@@ -34,5 +33,4 @@ export const DENY_TRIP = "Deny";
 export const ACCEPT_TRIP = "Accept";
 export const FINALIZE_TRIP = "Finalize";
 
-const localhost = Constants.manifest.extra.localhost;
-export const GATEWAY_URL = "http://" + localhost + ":" + API_GATEWAY_PORT;
+export const GATEWAY_URL = Constants.manifest.extra.GATEWAY_URL;
