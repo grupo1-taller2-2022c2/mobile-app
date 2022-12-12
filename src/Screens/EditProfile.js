@@ -14,7 +14,6 @@ import {
 } from "react-native";
 import {EDIT_PROF_EP, GATEWAY_URL, SESSION_EXPIRED_MSG, UPLOAD_PIC_PAS} from "../Constants";
 import {getUserStatus, getUserToken} from "../UserContext";
-import profilePicture from "../../assets/user-placeholder.png";
 
 function tryEditProfile(name, surname, token) {
     return axios.patch(GATEWAY_URL + EDIT_PROF_EP, {
@@ -57,7 +56,6 @@ export default function EditProfile({route, navigation}) {
             allowsEditing: true,
             aspect: [3, 3],
             quality: 1,
-            // base64: true
         });
         if (!result.cancelled) {
             setImage(result);
@@ -71,7 +69,7 @@ export default function EditProfile({route, navigation}) {
             </Text>
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                 {image && <Image source={{ uri: image.uri }} style={{ width: 200, height: 200, resizeMode: "contain"}} />}
-                {!image && <Image source={{uri: data.photo}} style={{height: 200, width:200, resizeMode: "contain"}}/>}
+                {!image && <Image source={{uri: data.photo + "?time=" + new Date()}} style={{height: 200, width:200, resizeMode: "contain"}}/>}
                 <Text>{"\n"}</Text>
                 <Button title="Pick an image" onPress={pickImage} />
             </View>
@@ -103,9 +101,7 @@ export default function EditProfile({route, navigation}) {
                             })
                             .then((token) => {
                                 if (image) {
-                                    tryUploadPicture(image.uri, token).then(
-                                        () => data.photo = image.uri
-                                    ).catch(
+                                    tryUploadPicture(image.uri, token).catch(
                                         (e) => {
                                             console.log(e);
                                             console.log(e.response.data);
@@ -117,9 +113,7 @@ export default function EditProfile({route, navigation}) {
                             })
                             .then(() => {
                                 Alert.alert("Successful profile change!", imageErrorMessage);
-                                data.username = name;
-                                data.surname = surname;
-                                navigation.navigate("MyProfile", {data: data});
+                                navigation.navigate("Home");
                             })
                             .catch((e) => {
                                 console.log(e);

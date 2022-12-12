@@ -11,46 +11,34 @@ import {
     TouchableOpacity,
     Button, Image,
 } from "react-native";
-import {EDIT_DRIVER_PROF_EP, GATEWAY_URL, SESSION_EXPIRED_MSG} from "../../Constants";
+import {EDIT_DRIVER_PROF_EP, GATEWAY_URL, SESSION_EXPIRED_MSG, UPLOAD_PIC_DRIVER} from "../../Constants";
 import {getUserStatus, getUserToken} from "../../UserContext";
-import profilePicture from "../../../assets/user-placeholder.png";
 
 function tryEditProfile(name, surname, license, model, token) {
     return axios.patch(GATEWAY_URL + EDIT_DRIVER_PROF_EP, {
         username: name,
         surname: surname,
-        ratings: 0, // Legacy
-        photo: "", // Legacy
+        ratings: 0,
         licence_plate: license,
-        model: model
+        model: model,
+        photo: ""
     }, {
         headers: { Authorization: "Bearer " + token },
     });
 }
 
-function PickAnImage() {
-    const [image, setImage] = useState(null);
-
-    const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [3, 3],
-            quality: 1,
-        });
-        if (!result.cancelled) {
-            setImage(result.uri);
-        }
-    };
-
-    return (
-        <View style={{alignItems: 'center', justifyContent: 'center' }}>
-            {image && <Image source={{ uri: image }} style={{ width: 200, height: 200, resizeMode: "contain"}} />}
-            {!image && <Image source={profilePicture} style={{height: 200, width:200, resizeMode: "contain"}}/>}
-            <Text>{"\n"}</Text>
-            <Button title="Pick an image" onPress={pickImage} />
-        </View>
-    );
+function tryUploadPicture(picture, token) {
+    const form = new FormData();
+    form.append('photo', {name: 'media', uri: picture, type: "image/jpg" });
+    return axios.post(GATEWAY_URL + UPLOAD_PIC_DRIVER,
+        form,
+        {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'multipart/form-data',
+                Authorization: "Bearer " + token
+            }
+        })
 }
 
 export default function DriverEditProfile({route, navigation}) {
@@ -59,16 +47,35 @@ export default function DriverEditProfile({route, navigation}) {
     const [surname, onChangeSurname] = useState(data.surname);
     const [licence_plate, onChangeLicence] = useState(data.licence_plate);
     const [model, onChangeModel] = useState(data.model);
+    const [image, setImage] = useState(null);
 
     const token = getUserToken();
     const userStatus = getUserStatus();
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [3, 3],
+            quality: 1,
+        });
+        if (!result.cancelled) {
+            setImage(result);
+        }
+    };
+
 
     return (
         <View style={styles.container}>
             <Text style={[styles.title, { fontSize: 15 }]}>
                 Please, enter your new profile information!
             </Text>
-            <PickAnImage/>
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                {image && <Image source={{ uri: image.uri }} style={{ width: 200, height: 200, resizeMode: "contain"}} />}
+                {!image && <Image source={{uri: data.photo + "?time=" + new Date()}} style={{height: 200, width:200, resizeMode: "contain"}}/>}
+                <Text>{"\n"}</Text>
+                <Button title="Pick an image" onPress={pickImage} />
+            </View>
             <Text>{"\n"}</Text>
             <TextInput
                 style={styles.input}
@@ -101,6 +108,7 @@ export default function DriverEditProfile({route, navigation}) {
             <TouchableOpacity
                 style={[styles.button, { backgroundColor: "dodgerblue" }]}
                 onPress={() => {
+                    var imageErrorMessage = "";
                     token
                         .value()
                         .catch((e) => {
@@ -109,15 +117,21 @@ export default function DriverEditProfile({route, navigation}) {
                             userStatus.signInState.signOut();
                         })
                         .then((token) => {
+                            if (image) {
+                                tryUploadPicture(image.uri, token).catch(
+                                    (e) => {
+                                        console.log(e);
+                                        console.log(e.response);
+                                        console.log(e.response.data);
+                                        imageErrorMessage = `But we couldn't upload your picture! ERROR ${e.response.status}: ${(e.response.data)? JSON.stringify(e.response.data): "Completely unexpected error" }`
+                                    }
+                                )
+                            }
                             return tryEditProfile(name, surname, licence_plate, model, token);
                         })
                         .then(() => {
-                            Alert.alert("Successful profile change!");
-                            data.username = name;
-                            data.surname = surname;
-                            data.licence_plate = licence_plate;
-                            data.model = model;
-                            navigation.navigate("DriverMyProfile", {data: data});
+                            Alert.alert("Successful profile change!", imageErrorMessage);
+                            navigation.navigate("DriverHome");
                         })
                         .catch((e) => {
                             console.log(e);
