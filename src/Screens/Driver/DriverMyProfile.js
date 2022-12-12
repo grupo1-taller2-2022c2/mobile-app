@@ -21,6 +21,11 @@ import {
         <Text style={{ color: "#fff", fontSize: 24 }}>License Plate: {data.licence_plate}</Text>
         <Text style={{ color: "#fff", fontSize: 24 }}>Vehicle Model: {data.model}</Text>
         </View>
+          <TouchableOpacity style={[styles.button,{marginTop: 70}]} onPress={() => {
+              navigation.navigate("DriverEditProfile", {data: data});
+          }} >
+              <Text style={{ color: "#fff", fontSize: 24 }}>Edit Profile</Text>
+          </TouchableOpacity>
         <TouchableOpacity style={[styles.button,{marginTop: 70}]} onPress={() => {
           navigation.navigate("DriverHome")
         }} >
