@@ -28,6 +28,8 @@ import PreTrip from "./Screens/Driver/PreTrip";
 import DriverTrip from "./Screens/Driver/DriverTrip";
 import DriverRating from "./Screens/Driver/DriverRating";
 import WalletDriver from "./Screens/Driver/WalletDriver";
+import EditProfile from "./Screens/EditProfile";
+import DriverEditProfile from "./Screens/Driver/DriverEditProfile";
 
 export function NavigationStack() {
   const userStatus = getUserStatus();
@@ -45,6 +47,11 @@ export function NavigationStack() {
               name="DriverMyProfile"
               component={DriverMyProfile}
               options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="DriverEditProfile"
+                component={DriverEditProfile}
+                options={{ headerShown: false }}
             />
             <Stack.Screen
                 name="WalletDriver"
@@ -88,6 +95,11 @@ export function NavigationStack() {
               name="MyProfile"
               component={MyProfile}
               options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="EditProfile"
+                component={EditProfile}
+                options={{ headerShown: false }}
             />
             <Stack.Screen
               name="Map"

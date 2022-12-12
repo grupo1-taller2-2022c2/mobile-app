@@ -13,7 +13,7 @@ import {
     const {data} = route.params;
     return (
       <View style={styles.myProfile}>
-        <Image source={profilePicture} style={{height: 200, width:200, resizeMode: "contain"}}/>
+        <Image source={{uri: data.photo + "?time=" + new Date()}} style={{height: 200, width:200, resizeMode: "contain"}}/>
         <View style={{marginTop: 20}}>
         <Text style={{ color: "#fff", fontSize: 24 }}>Email Address: {data.email}</Text>
         <Text style={{ color: "#fff", fontSize: 24 }}>Name: {data.username} {data.surname}</Text>
@@ -21,6 +21,11 @@ import {
         <Text style={{ color: "#fff", fontSize: 24 }}>License Plate: {data.licence_plate}</Text>
         <Text style={{ color: "#fff", fontSize: 24 }}>Vehicle Model: {data.model}</Text>
         </View>
+          <TouchableOpacity style={[styles.button,{marginTop: 70}]} onPress={() => {
+              navigation.navigate("DriverEditProfile", {data: data});
+          }} >
+              <Text style={{ color: "#fff", fontSize: 24 }}>Edit Profile</Text>
+          </TouchableOpacity>
         <TouchableOpacity style={[styles.button,{marginTop: 70}]} onPress={() => {
           navigation.navigate("DriverHome")
         }} >
