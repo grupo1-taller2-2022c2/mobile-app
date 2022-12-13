@@ -15,6 +15,10 @@ export const map_styles = StyleSheet.create({
       width: width,
       height: height * 0.75,
     },
+    map_in_trip: {
+        width: width,
+        height: height,
+    },
     title: {
       color: "black",
       marginBottom: 10,
