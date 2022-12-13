@@ -17,3 +17,10 @@ To run this app simply run the following command:
 If it doesnt work for any reason, try using a tunnel:
 `ngrok http 3000`
 `expo start --tunnel`
+
+## Building the .apk
+
+First of all, we need to make sure we are using a version of npm > 14 (in this project we use v18.12.1)
+
+Then, just run 
+```eas build -p android --profile production```
