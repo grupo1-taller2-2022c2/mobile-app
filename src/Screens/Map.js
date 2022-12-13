@@ -256,6 +256,8 @@ function MyMapView() {
   } = context.values;
   const navigation = React.useContext(NavigationContext);
 
+  const [isProcessingTrip, setIsProcessingTrip] = React.useState(false);
+
   //FIXME: temporary fix
   const [incomingNavigation, setIncomingNavigation] = React.useState(false);
   const [assignedDriver, setAssignedDriver] = React.useState(false);
@@ -311,14 +313,20 @@ function MyMapView() {
                 destination?
               </Text>
               <Pressable
-                style={[modal_styles.button, modal_styles.buttonClose]}
+                  style={({pressed}) => [modal_styles.button,
+                    pressed? modal_styles.buttonPressed : modal_styles.buttonNoPress]}
                 onPress={async () => {
                   try {
+                    if (isProcessingTrip) {
+                      return
+                    }
+                    setIsProcessingTrip(true);
                     let userToken;
                     try {
                       userToken = await token.value();
                     } catch (e) {
                       //Should be unreachable
+                      setIsProcessingTrip(false);
                       console.log("Token not found");
                       Alert.alert("Something went wrong!");
                       userStatus.signInState.signOut();
@@ -369,6 +377,7 @@ function MyMapView() {
                     setTripID(tripId);
                     let assignedDriver = create_response.data[1];
                     if (assignedDriver === null) {
+                      setIsProcessingTrip(false);
                       Alert.alert("There are no drivers available right now!");
                       setTripModalVisible(!tripModalVisible);
                       return;
@@ -378,9 +387,15 @@ function MyMapView() {
                     })*/ 
                     setAssignedDriver(assignedDriver);
                     setIncomingNavigation(true);
+                    setIsProcessingTrip(false);
                   } catch (e) {
                     console.log(e);
-                    Alert.alert("Could not perform driver lookup");
+                    if ((e.response) && (e.response.data) && (e.response.data.detail)) {
+                      Alert.alert(e.response.data.detail);
+                    } else {
+                      Alert.alert("Could not perform driver lookup");
+                    }
+                    setIsProcessingTrip(false);
                   }
                   setTripModalVisible(!tripModalVisible);
                 }}
@@ -388,7 +403,8 @@ function MyMapView() {
                 <Text style={modal_styles.textStyle}>Start the search!</Text>
               </Pressable>
               <Pressable
-                style={[modal_styles.button, modal_styles.buttonClose]}
+                  style={({pressed}) => [modal_styles.button,
+                    pressed? modal_styles.buttonPressed : modal_styles.buttonNoPress]}
                 onPress={() => {
                   setTripModalVisible(!tripModalVisible);
                 }}

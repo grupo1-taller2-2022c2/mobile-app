@@ -23,11 +23,13 @@ export const EDIT_PROF_EP = "/passengers/";
 export const EDIT_DRIVER_PROF_EP = "/drivers/";
 export const UPLOAD_PIC_PAS = "/passengers/picture";
 export const UPLOAD_PIC_DRIVER = "/drivers/picture";
+export const REPORT_DRIVER = "/drivers/reports";
 
 export const GOOGLE_MAPS_APIKEY = "AIzaSyD3H-dhvbdSHcltS1cJQp10oty-xO9faPE";
 export const GOOGLE_DISTANCE_MATRIX_URL = "https://maps.googleapis.com/maps/api/distancematrix/json"
 
 export const HTTP_STATUS_OK = 200;
+export const HTTP_STATUS_CREATED = 201;
 export const HTTP_STATUS_UNAUTHORIZED = 401;
 export const HTTP_STATUS_DOESNT_EXIST = 404;
 export const HTTP_STATUS_VALID_ERROR = 422;
