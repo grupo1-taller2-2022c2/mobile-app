@@ -75,10 +75,10 @@ export const modal_styles = StyleSheet.create({
       margin: 12,
       marginLeft: 0,
     },
-    buttonOpen: {
-      backgroundColor: "#F194FF",
+    buttonPressed: {
+      backgroundColor: "#93c6ee",
     },
-    buttonClose: {
+    buttonNoPress: {
       backgroundColor: "#2196F3",
     },
     textStyle: {
