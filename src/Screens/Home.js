@@ -2,7 +2,7 @@ import axios from "axios";
 import {
   Text,
   View,
-  TextInput,
+    Image,
   Alert,
   TouchableOpacity,
   Button,
@@ -19,6 +19,7 @@ import Profile from "./MyProfile";
 import Wallet from "./Wallet";
 import SavedLocations from "./SavedLocations";
 import DriverRegistration from "./DriverRegister";
+import {MaterialIcons, FontAwesome, MaterialCommunityIcons} from '@expo/vector-icons';
 
 
 const Drawer = createDrawerNavigator();
@@ -27,16 +28,6 @@ function tryGetMyProfile(token) {
   return axios.get(GATEWAY_URL + ME_EP, {
     headers: { Authorization: "Bearer " + token },
   });
-}
-
-function trySendNotificationsToken(userToken, expoToken) {
-  return axios.post(
-    GATEWAY_URL + NOTIF_TOKEN_EP,
-    {
-      token: expoToken,
-    },
-    { headers: { Authorization: "Bearer " + userToken } }
-  );
 }
 
 export default function Home({ navigation }) {
@@ -83,31 +74,63 @@ export default function Home({ navigation }) {
                         drawerContent={props => {
                             return (
                                 <DrawerContentScrollView {...props}>
+                                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 1,
+                                    height: 100}}>
+                                        {myProfile ?
+                                            <Image source={{uri: myProfile.photo + "?time=" + new Date()}}
+                                                   style={{height: 60, width:60, resizeMode: "contain", borderColor: "grey",
+                                                       position: 'absolute', borderWidth:2, top: 20, left:20}} />
+                                            : null}
+                                        {myProfile ?
+                                            <View style={{height: 60, width:200, position: 'absolute',
+                                                          top: 20, right:10, left: 100}}>
+                                                <Text style={{fontWeight: 'bold', fontSize: 20}}>
+                                                    {myProfile.username} {myProfile.surname}
+                                                </Text>
+                                                <Text style={{fontSize: 14}}>
+                                                    {myProfile.email}
+                                                </Text>
+                                            </View>
+                                            : null}
+                                    </View>
                                     <DrawerItemList {...props} />
                                     {userStatus.registeredAsDriver.value?
-                                        <DrawerItem label="Switch to Driver mode" onPress={() => userStatus.driverMode.enter()}/>
+                                        <DrawerItem label="Switch to Driver mode" onPress={() => userStatus.driverMode.enter()}
+                                                    icon={() => <FontAwesome name="taxi" size={20} color="black"/>}/>
                                         : null}
-                                    <DrawerItem label="Log Out" onPress={() => userStatus.signInState.signOut()} />
+                                    <DrawerItem label="Log Out" onPress={() => userStatus.signInState.signOut()}
+                                                icon={() => <MaterialIcons name="logout" size={24} color="black"/>}/>
                                 </DrawerContentScrollView>
                             )
                         }}>
           <Drawer.Screen name="Frontpage" component={Frontpage}
-                         options={{headerShown: false}}/>
+                         options={{headerShown: false, drawerIcon:() =>
+                                 <MaterialIcons name="house" size={24} color="black"/>
+                         }}
+          />
           { myProfile ?
               <Drawer.Screen name="Profile" component={Profile}
-                             options={{headerShown: false}}
-                             initialParams={{data: myProfile}}/>
+                             options={{headerShown: false, drawerIcon:() =>
+                                     <FontAwesome name="users" size={24} color="black"/>}}
+                             initialParams={{data: myProfile}}
+              />
               : null }
           {myProfile ?
               <Drawer.Screen name="Wallet" component={Wallet}
-                             options={{headerShown: false}}
-                             initialParams={{data: myProfile}}/>
+                             options={{headerShown: false,  drawerIcon:() =>
+                                     <MaterialCommunityIcons name="ethereum" size={24} color="black"/>}}
+                             initialParams={{data: myProfile}}
+              />
               : null }
           <Drawer.Screen name="Saved Locations" component={SavedLocations}
-                         options={{headerShown: false}}/>
+                         options={{headerShown: false, drawerIcon:() =>
+                                 <FontAwesome name="bookmark" size={30} color="black"/>}}
+          />
           {userStatus.registeredAsDriver.value ? null
               : <Drawer.Screen name="Register As Driver" component={DriverRegistration}
-                               options={{headerShown: false}}/>
+                               options={{headerShown: false, drawerIcon:() =>
+                                       <FontAwesome name="drivers-license-o" size={24} color="black"/>}}
+              />
           }
       </Drawer.Navigator>
   );
