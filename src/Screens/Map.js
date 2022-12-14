@@ -214,7 +214,7 @@ function SearchTab() {
             } catch (error) {
               if (error.response.status) {
                 const status_code = error.response.status;
-                if (status_code == HTTP_STATUS_UNAUTHORIZED) {
+                if (status_code === HTTP_STATUS_UNAUTHORIZED) {
                   Alert.alert(SESSION_EXPIRED_MSG);
                   userStatus.signInState.signOut();
                   return;
@@ -282,6 +282,7 @@ function MyMapView() {
           longitudeDelta: LONGITUDE_DELTA,
         }}
         showsUserLocation={true}
+        toolbarEnabled={false}
       >
         {destinationCoords ? (
           <MapView.Marker title="Destination" coordinate={destinationCoords} />

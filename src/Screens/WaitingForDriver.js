@@ -46,19 +46,21 @@ export default function WaitingForDriver({ route }) {
       let userToken = await token.value();
       const response = await tryGetTripState(userToken, tripID);
       if (response.status === HTTP_STATUS_OK) {
-        if (response.data.state === "Accepted") {
+        if (response.data.state === "Accepted" || response.data.state === "In course" ||
+            response.data.state === "Completed") {
           setDriverAcceptedTrip(true);
-        }
-        else if (response.data.state === "Denied") {
+          navigation.replace("WaitingForTripToEnd", { data: response.data, asignedDriver: driver,
+            sourceCoords: sourceCoords, destinationCoords: destinationCoords });
+        } else if (response.data.state === "Denied") {
           Alert.alert('Trip Denied', 'Trip was denied by designated driver. Try again.',
               [{text: "Return to Menu"}]);
           navigation.navigate("Home");
         }
-        else if (response.data.state === "In course" ||
-            response.data.state === "Completed") {
-          navigation.replace("WaitingForTripToEnd", { data: response.data, asignedDriver: driver,
-            sourceCoords: sourceCoords, destinationCoords: destinationCoords });
-        }
+        //else if (response.data.state === "In course" ||
+        //    response.data.state === "Completed") {
+        //  navigation.replace("WaitingForTripToEnd", { data: response.data, asignedDriver: driver,
+        //    sourceCoords: sourceCoords, destinationCoords: destinationCoords });
+        //}
       }
     } catch (error) {
       console.log(error);

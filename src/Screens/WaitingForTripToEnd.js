@@ -1,12 +1,13 @@
 import { styles } from "../Styles";
 import { mapContext, MapContextProvider } from "../MapContext";
-import {GENERIC_ERROR_MSG, GOOGLE_MAPS_APIKEY, HTTP_STATUS_CREATED} from "../Constants";
+import {GENERIC_ERROR_MSG, GOOGLE_MAPS_APIKEY, HTTP_STATUS_CREATED, UPDATE_LOCATION_EP} from "../Constants";
 import { getUserStatus, getUserToken } from "../UserContext";
 import axios from "axios";
 import * as React from "react";
 import { TRIPS_EP, HTTP_STATUS_OK, GATEWAY_URL, REPORT_DRIVER } from "../Constants";
 import * as Location from "expo-location";
-import ainsley from "../../assets/ainsley.png";
+import passengerMarker from "../../assets/passengerMarker.png";
+import driverMarker from "../../assets/driverMarker.png";
 import reportFlag from "../../assets/reportFlag.png";
 
 import {
@@ -18,7 +19,7 @@ import {
     Alert,
     Modal,
     Image,
-    Pressable, TouchableHighlight,
+    Pressable,
 } from "react-native";
 import { useEffect, useState } from "react";
 import {NavigationContext} from "@react-navigation/native";
@@ -46,6 +47,12 @@ function tryReportDriver(driver_email, trip_id, reason, token) {
         trip_id: trip_id,
         reason: reason
     }, {
+        headers: { Authorization: "Bearer " + token },
+    });
+}
+
+function tryDriverLocation(driver_email, token) {
+    return axios.get(GATEWAY_URL + UPDATE_LOCATION_EP + '/' + driver_email, {
         headers: { Authorization: "Bearer " + token },
     });
 }
@@ -78,17 +85,21 @@ export default function WaitingForTripToEnd({ route }) {
     let sourceCoords = route.params.sourceCoords;
     let destinationCoords = route.params.destinationCoords;
 
-    const [userLocation, setUserLocation] = React.useState(null);
-    const [reportModalVisible, setReportModalVisible] = React.useState(false);
-    const [reportMessage, onChangeReportMessage] = React.useState("");
-    const [profileModalVisible, setProfileModalVisible] = React.useState(false);
+    const [userLocation, setUserLocation] = useState(null);
+    const [driverLocation, setDriverLocation] = useState(null);
+    const [reportModalVisible, setReportModalVisible] = useState(false);
+    const [reportMessage, onChangeReportMessage] = useState("");
+    const [driverArrived, setDriverArrived] = useState(false);
+    const [profileModalVisible, setProfileModalVisible] = useState(true);
 
     async function hasTripEnded(tripID) {
         try {
             let userToken = await token.value();
             const response = await tryGetTripState(userToken, tripID);
             if (response.status === HTTP_STATUS_OK) {
-                if (response.data.state === "Completed") {
+                if (response.data.state === "In course" ) {
+                    setDriverArrived(true);
+                } else if (response.data.state === "Completed") {
                     navigation.replace("RateTrip", { data: response.data, asignedDriver: driver });
                 }
             }
@@ -113,6 +124,22 @@ export default function WaitingForTripToEnd({ route }) {
         }
     }
 
+    async function tryGettingDriverLocation() {
+            let userToken = await token.value();
+            tryDriverLocation(driver.email, userToken)
+            .then( async (response) => {
+                const driverLoc = await getCoordsFromAddress(
+                    response.data.street_name + " " + response.data.street_num
+                );
+                if (driverLoc) {
+                    setDriverLocation(driverLoc);
+                }
+            }).catch( (e) => {
+                console.log(e);
+                Alert.alert("Error", GENERIC_ERROR_MSG);
+                userStatus.signInState.signOut();
+            })
+    }
 
     useEffect(() => {
         const trySettingLocation = (async () => {
@@ -120,7 +147,7 @@ export default function WaitingForTripToEnd({ route }) {
             setUserLocation(location);
         });
         const interval = setInterval(() => {
-            trySettingLocation();
+            driverArrived ? trySettingLocation() : tryGettingDriverLocation();
             console.log("Asking if trip has ended...");
             hasTripEnded(tripID);
         }, 5000);
@@ -130,13 +157,9 @@ export default function WaitingForTripToEnd({ route }) {
 
     return (
         <View style={[styles.container, { alignItems: "center" }]}>
-            <Text style={[styles.text, { margin: 30, fontSize: 30 }]}>
-                You're now being driven safely to your location!{"\n"}
-                You will be at your destination soon!
-            </Text>
             <MapView
                 ref={mapRef}
-                style={map_styles.map}
+                style={map_styles.map_in_trip}
                 initialRegion= {{
                     latitude: sourceCoords.latitude,
                     longitude: sourceCoords.longitude,
@@ -147,8 +170,9 @@ export default function WaitingForTripToEnd({ route }) {
                 toolbarEnabled={false}
             >
                 <MapView.Marker title="Destination" coordinate={destinationCoords} />
-                {userLocation ? (
-                    <MapView.Marker title="UserLoc" image={ainsley} coordinate={userLocation.coords} />
+                {(driverArrived && userLocation) || (!driverArrived && driverLocation) ? (
+                    <MapView.Marker title={driverArrived? "Actual Location" : "Driver Location"} image={driverArrived? passengerMarker : driverMarker}
+                                    coordinate={driverArrived? userLocation.coords : driverLocation} />
                 ) : null}
                 <MapViewDirections
                     origin={sourceCoords}
@@ -206,14 +230,78 @@ export default function WaitingForTripToEnd({ route }) {
                     </View>
                 </Modal>
             ) : null}
+            {profileModalVisible ? (
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={profileModalVisible}
+                    onRequestClose={() => {
+                        setProfileModalVisible(!profileModalVisible);
+                    }}
+                >
+                    <View style={modal_styles.centeredView}>
+                        <View style={modal_styles.modalView}>
+                            <Text style={[modal_styles.modalText, {fontSize: 25, fontWeight: "bold"}]}>
+                                Meet your Driver!
+                            </Text>
+                            <Image
+                                source={driver.photo ? {uri: driver.photo} : passengerMarker}
+                                style={
+                                    {height:250, width:250}
+                                }
+                            />
+                            <Text style={[modal_styles.modalText, {marginTop: 20}]}>
+                                Name: {driver.username}
+                            </Text>
+                            <Text style={modal_styles.modalText}>
+                                Surname: {driver.surname}
+                            </Text>
+                            <Text style={modal_styles.modalText}>
+                                Licence plate: {driver.licence_plate}
+                            </Text>
+                            <Text style={modal_styles.modalText}>
+                                Model: {driver.model}
+                            </Text>
+                            <Text style={modal_styles.modalText}>
+                                Rating: {driver.ratings}
+                            </Text>
+                            <Pressable
+                                style={({pressed}) => [modal_styles.button,
+                                    pressed? modal_styles.buttonPressed : modal_styles.buttonNoPress]}
+                                onPress={() => {
+                                    setProfileModalVisible(!profileModalVisible);
+                                }}
+                            >
+                                <Text style={modal_styles.textStyle}>
+                                    Got it!
+                                </Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </Modal>
+            ) : null}
+            {driverArrived ? (
+                <TouchableOpacity
+                    onPress={() => setReportModalVisible(true)}
+                    style={{position: 'absolute', bottom: 10, right: 10, height:50, width:50}}
+                >
+                    <Image
+                        source={reportFlag}
+                        style={
+                            {height:50, width:50, bottom:20, right:10}
+                        }
+                    />
+                </TouchableOpacity>
+            ) : null}
             <TouchableOpacity
-                onPress={() => setReportModalVisible(true)}
-                style={{position: 'absolute', bottom: 10, right: 10, height:50, width:50}}
+                onPress={() => setProfileModalVisible(true)}
+                style={{position: 'absolute', top: 80, right: 10, height:50, width:50}}
             >
                 <Image
-                    source={reportFlag}
+                    source={driver.photo ? {uri: driver.photo} : passengerMarker}
                     style={
-                        {height:50, width:50, bottom:20, right:10}
+                        {height:80, width:80, bottom:20, right:30, borderRadius: 100,
+                            borderWidth:2, borderColor:"black",  overflow: "hidden"}
                     }
                 />
             </TouchableOpacity>
