@@ -30,6 +30,7 @@ import DriverRating from "./Screens/Driver/DriverRating";
 import WalletDriver from "./Screens/Driver/WalletDriver";
 import EditProfile from "./Screens/EditProfile";
 import DriverEditProfile from "./Screens/Driver/DriverEditProfile";
+import SavedLocations from "./Screens/SavedLocations";
 
 export function NavigationStack() {
   const userStatus = getUserStatus();
@@ -129,6 +130,11 @@ export function NavigationStack() {
             <Stack.Screen
                 name="Wallet"
                 component={Wallet}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="SavedLocations"
+                component={SavedLocations}
                 options={{ headerShown: false }}
             />
           </>
