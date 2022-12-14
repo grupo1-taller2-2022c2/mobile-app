@@ -6,12 +6,11 @@ import MapViewDirections from "react-native-maps-directions";
 import {
   GOOGLE_MAPS_APIKEY,
   TRIP_COST_EP,
-  API_GATEWAY_PORT,
   SESSION_EXPIRED_MSG,
   GOOGLE_DISTANCE_MATRIX_URL,
   HTTP_STATUS_UNAUTHORIZED,
   CREATE_TRIP_EP,
-  GATEWAY_URL
+  GATEWAY_URL, SAVED_LOCATION, HTTP_STATUS_DOESNT_EXIST, GENERIC_ERROR_MSG, HTTP_STATUS_OK
 } from "../Constants";
 import { mapContext } from "../MapContext";
 import { getUserStatus, getUserToken } from "../UserContext";
@@ -85,6 +84,12 @@ function tryGetTripDistanceAndTime(origin, destination) {
   });
 }
 
+function tryGetNamedLocation(name, token) {
+  return axios.get(GATEWAY_URL + SAVED_LOCATION + name, {
+    headers: {Authorization: "Bearer " + token}
+  });
+}
+
 function tryCreateTrip(
   token,
   src_address,
@@ -125,6 +130,26 @@ function SearchTab() {
   } = context.setters;
   let { destinationInput, userAddress, userLocation } = context.values;
 
+  async function updateDestinationInputIfNamed() {
+    try {
+      let userToken = await token.value();
+      const response = await tryGetNamedLocation(destinationInput, userToken);
+      if (response.status === HTTP_STATUS_OK) {
+        onChangeDestinationInput(
+            response.data.street_name + " " + response.data.street_num
+        )
+        return response.data.street_name + " " + response.data.street_num;
+      }
+    } catch(e) {
+        if (e.response && e.response.status === HTTP_STATUS_DOESNT_EXIST) {
+          return destinationInput;
+        }
+        console.log(e);
+        Alert.alert("Error", GENERIC_ERROR_MSG);
+        userStatus.signInState.signOut();
+    }
+  }
+
   return (
     <View style={{ margin: 50, marginBottom: 10 }}>
       <Text style={map_styles.title}>Please enter your destination</Text>
@@ -139,9 +164,12 @@ function SearchTab() {
           style={map_styles.button}
           onPress={async () => {
             try {
+              let parsedDestinationInput = await updateDestinationInputIfNamed();
+              console.log(parsedDestinationInput)
               let input_coordinates = await getCoordsFromAddress(
-                destinationInput
+                  parsedDestinationInput
               );
+
               if (input_coordinates === null) {
                 Alert.alert("Please enter a valid address");
                 return;
@@ -177,11 +205,15 @@ function SearchTab() {
                 input_coordinates.latitude + "," + input_coordinates.longitude;
 
               let response = await tryGetTripDistanceAndTime(
-                originGoogle,
-                destinationGoogle
+                  originGoogle,
+                  destinationGoogle
               );
-              let { distance, duration } = response.data.rows[0].elements[0];
 
+              let { distance, duration } = response.data.rows[0].elements[0];
+              if (!distance || !duration) {
+                Alert.alert("Please enter a valid address");
+                return
+              }
               let tripPriceResponse = await tryGetTripPrice(
                 userToken,
                 userAddress.street,
@@ -261,6 +293,7 @@ function MyMapView() {
   //FIXME: temporary fix
   const [incomingNavigation, setIncomingNavigation] = React.useState(false);
   const [assignedDriver, setAssignedDriver] = React.useState(false);
+
   useEffect(() => {
     if (incomingNavigation) {
       navigation.navigate("WaitingForDriver", {
@@ -333,7 +366,6 @@ function MyMapView() {
                       userStatus.signInState.signOut();
                     }
                     //FIXME: ALL THIS CODE IS COPIED FROM ANOTHER FUNCTION
-
                     let input_coordinates = await getCoordsFromAddress(
                       destinationInput
                     );

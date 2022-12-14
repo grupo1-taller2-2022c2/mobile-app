@@ -24,6 +24,7 @@ export const EDIT_DRIVER_PROF_EP = "/drivers/";
 export const UPLOAD_PIC_PAS = "/passengers/picture";
 export const UPLOAD_PIC_DRIVER = "/drivers/picture";
 export const REPORT_DRIVER = "/drivers/reports";
+export const SAVED_LOCATION = "/trips/saved_location/";
 
 export const GOOGLE_MAPS_APIKEY = "AIzaSyD3H-dhvbdSHcltS1cJQp10oty-xO9faPE";
 export const GOOGLE_DISTANCE_MATRIX_URL = "https://maps.googleapis.com/maps/api/distancematrix/json"

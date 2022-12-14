@@ -108,6 +108,14 @@ export default function Home({ navigation }) {
       >
         <Text style={styles.buttonText}>Go to Map!</Text>
       </TouchableOpacity>
+        <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+                navigation.navigate("SavedLocations");
+            }}
+        >
+            <Text style={styles.buttonText}>Saved Locations</Text>
+        </TouchableOpacity>
       {userStatus.registeredAsDriver.value ? (
         <TouchableOpacity
           style={styles.button}
