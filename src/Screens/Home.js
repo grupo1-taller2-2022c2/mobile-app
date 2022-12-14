@@ -11,7 +11,17 @@ import { styles } from "../Styles";
 import { getUserStatus, getUserToken } from "../UserContext";
 import { API_GATEWAY_PORT, DRIVER_ME_EP, ME_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, GATEWAY_URL, NOTIF_TOKEN_EP } from "../Constants";
 import {updateDriverStatus} from "./Utils";
+import {useEffect, useState} from "react";
+import {useIsFocused} from "@react-navigation/native";
+import {createDrawerNavigator, DrawerContentScrollView, DrawerItem, DrawerItemList} from "@react-navigation/drawer";
+import Frontpage from "./Frontpage";
+import Profile from "./MyProfile";
+import Wallet from "./Wallet";
+import SavedLocations from "./SavedLocations";
+import DriverRegistration from "./DriverRegister";
 
+
+const Drawer = createDrawerNavigator();
 
 function tryGetMyProfile(token) {
   return axios.get(GATEWAY_URL + ME_EP, {
@@ -32,125 +42,73 @@ function trySendNotificationsToken(userToken, expoToken) {
 export default function Home({ navigation }) {
   const userStatus = getUserStatus();
   const token = getUserToken();
+  const isFocused = useIsFocused();
+  const [myProfile, setMyProfile] = useState(null);
   updateDriverStatus(token, userStatus);
-  return (
-    <View style={styles.container}>
-      <Text
-        style={{ padding: 10, marginTop: 20, color: "#fff", marginBottom: 5 }}
-      >
-        You have succesfully logged in!
-      </Text>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          userStatus.signInState.signOut();
-        }}
-      >
-        <Text style={styles.buttonText}>Log out</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          token
-            .value()
-            .catch((e) => {
+
+  const fetchProfile = () => {
+      token
+          .value()
+          .catch((e) => {
               console.log("Token not found");
               Alert.alert("Something went wrong!");
               userStatus.signInState.signOut();
-            })
-            .then((token) => {
+          })
+          .then((token) => {
               return tryGetMyProfile(token);
-            })
-            .then((response) => {
-              navigation.navigate("MyProfile", { data: response.data });
-            })
-            .catch((e) => {
+          })
+          .then((response) => {
+              setMyProfile(response.data);
+          })
+          .catch((e) => {
               console.log(e);
               //FIXME: is this truly the only error case?
               Alert.alert(SESSION_EXPIRED_MSG);
               userStatus.signInState.signOut();
-            });
-        }}
-      >
-        <Text style={styles.buttonText}>My Profile</Text>
-      </TouchableOpacity>
-        <TouchableOpacity // Esto es horrible. Despues le metemos un useState con el profile o algo asi
-            style={styles.button}
-            onPress={() => {
-                token
-                    .value()
-                    .catch((e) => {
-                        console.log("Token not found");
-                        Alert.alert("Something went wrong!");
-                        userStatus.signInState.signOut();
-                    })
-                    .then((token) => {
-                        return tryGetMyProfile(token);
-                    })
-                    .then((response) => {
-                        navigation.navigate("Wallet", { data: response.data });
-                    })
-                    .catch((e) => {
-                        console.log(e);
-                        //FIXME: is this truly the only error case?
-                        Alert.alert(SESSION_EXPIRED_MSG);
-                        userStatus.signInState.signOut();
-                    });
-            }}
-        >
-            <Text style={styles.buttonText}>See or Increase funds</Text>
-        </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          navigation.navigate("Map");
-        }}
-      >
-        <Text style={styles.buttonText}>Go to Map!</Text>
-      </TouchableOpacity>
-        <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-                navigation.navigate("SavedLocations");
-            }}
-        >
-            <Text style={styles.buttonText}>Saved Locations</Text>
-        </TouchableOpacity>
-      {userStatus.registeredAsDriver.value ? (
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            userStatus.driverMode.enter();
-          }}
-        >
-          <Text style={styles.buttonText}>Switch to Driver mode</Text>
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            navigation.navigate("DriverRegistration");
-          }}
-        >
-          <Text style={styles.buttonText}>Register as a Driver!</Text>
-        </TouchableOpacity>
-      )}
-       <TouchableOpacity
-          style={styles.button}
-          onPress={async () => {
-            try {
-              let userToken = await token.value()
-              //FIXME: add real notification token
-              await trySendNotificationsToken(userToken, "to-be-done")
-            }
-            catch(e) {
-              //FIXME: add more error cases
-              console.log(e)
-            }
-          }}
-        >
-          <Text style={styles.buttonText}>Send Expo Notification Token</Text>
-        </TouchableOpacity>
-    </View>
+          });
+  }
+
+  useEffect(() => {
+      fetchProfile()
+  }, [isFocused]);
+
+    return (
+      <Drawer.Navigator useLegacyImplementation
+                        drawerType="front"
+                        initialRouteName="Profile"
+                        screenOptions={{
+                            activeTintColor: '#e91e63',
+                            itemStyle: { marginVertical: 10 },
+                        }}
+                        drawerContent={props => {
+                            return (
+                                <DrawerContentScrollView {...props}>
+                                    <DrawerItemList {...props} />
+                                    {userStatus.registeredAsDriver.value?
+                                        <DrawerItem label="Switch to Driver mode" onPress={() => userStatus.driverMode.enter()}/>
+                                        : null}
+                                    <DrawerItem label="Log Out" onPress={() => userStatus.signInState.signOut()} />
+                                </DrawerContentScrollView>
+                            )
+                        }}>
+          <Drawer.Screen name="Frontpage" component={Frontpage}
+                         options={{headerShown: false}}/>
+          { myProfile ?
+              <Drawer.Screen name="Profile" component={Profile}
+                             options={{headerShown: false}}
+                             initialParams={{data: myProfile}}/>
+              : null }
+          {myProfile ?
+              <Drawer.Screen name="Wallet" component={Wallet}
+                             options={{headerShown: false}}
+                             initialParams={{data: myProfile}}/>
+              : null }
+          <Drawer.Screen name="Saved Locations" component={SavedLocations}
+                         options={{headerShown: false}}/>
+          {userStatus.registeredAsDriver.value ? null
+              : <Drawer.Screen name="Register As Driver" component={DriverRegistration}
+                               options={{headerShown: false}}/>
+          }
+      </Drawer.Navigator>
   );
 }
