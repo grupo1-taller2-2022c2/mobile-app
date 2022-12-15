@@ -10,6 +10,7 @@ import {
 import { styles } from "../Styles";
 import passengerMarker from "../../assets/passengerMarker.png";
 import * as React from "react";
+import {MaterialIcons} from "@expo/vector-icons";
 
 
 export default function Frontpage({ navigation }) {
@@ -17,15 +18,9 @@ export default function Frontpage({ navigation }) {
         <View style={styles.container}>
             <TouchableOpacity
                 onPress={() => navigation.openDrawer()}
-                style={{position: 'absolute', top: 10, left: 10, height:50, width:50}}
+                style={{position: 'absolute', top: 40, left: 15, height:50, width:50}}
             >
-                <Image
-                    source={passengerMarker}
-                    style={
-                        {height:80, width:80, bottom:20, right:30, borderRadius: 100,
-                            borderWidth:2, borderColor:"black",  overflow: "hidden"}
-                    }
-                />
+                <MaterialIcons name="menu-open" size={50} color='white'/>
             </TouchableOpacity>
             <Text
                 style={{ padding: 10, marginTop: 20, color: "#fff", marginBottom: 5 }}

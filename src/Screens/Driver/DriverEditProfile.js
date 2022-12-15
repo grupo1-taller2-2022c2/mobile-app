@@ -156,7 +156,7 @@ export default function DriverEditProfile({route, navigation}) {
                 <Text style={styles.buttonText}>Fast Fill-in(dev)</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.button,{marginTop: 70}]} onPress={() => {
-                navigation.navigate("DriverMyProfile", {data: data})
+                navigation.navigate("DriverHome")
             }} >
                 <Text style={{ color: "#fff", fontSize: 24 }}>Back</Text>
             </TouchableOpacity>

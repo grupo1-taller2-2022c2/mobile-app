@@ -137,7 +137,7 @@ export default function EditProfile({route, navigation}) {
                 <Text style={styles.buttonText}>Fast Fill-in(dev)</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.button,{marginTop: 70}]} onPress={() => {
-                navigation.navigate("MyProfile", {data: data})
+                navigation.navigate("Home")
             }} >
                 <Text style={{ color: "#fff", fontSize: 24 }}>Back</Text>
             </TouchableOpacity>

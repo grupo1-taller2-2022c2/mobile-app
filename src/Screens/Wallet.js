@@ -17,6 +17,7 @@ import {getUserToken} from "../UserContext";
 import * as React from "react";
 import {NavigationContext} from "@react-navigation/native";
 import * as Clipboard from 'expo-clipboard';
+import {MaterialIcons} from "@expo/vector-icons";
 
 
 export default function Wallet({route}) {
@@ -41,6 +42,12 @@ export default function Wallet({route}) {
     useEffect(refreshWallet, []);
     return (
         <View style={[styles.container, { alignItems: "center", justifyContent: "center"}]}>
+            <TouchableOpacity
+                onPress={() => navigation.openDrawer()}
+                style={{position: 'absolute', top: 56, left: 5, height:50, width:50}}
+            >
+                <MaterialIcons name="menu-open" size={50} color='white'/>
+            </TouchableOpacity>
             <Text style={[styles.title, {marginTop:50, fontSize:40}]}>Wallet Balance</Text>
             {walletInfo ? (
                 <View style={[styles.container, {marginTop:0, marginBottom:0, alignItems: "center", justifyContent: "center" }]}>
@@ -59,7 +66,7 @@ export default function Wallet({route}) {
                             {walletInfo.address}
                         </Text>
                     </View>
-                    <View style={{ marginTop:80, marginBottom:30, alignItems: "center", justifyContent: "center", height: 300,
+                    <View style={{ marginTop:80, marginBottom:150, alignItems: "center", justifyContent: "center", height: 300,
                         width: 400, borderWidth: 2, borderRadius:40, borderColor: "grey" }}>
                         <Image source={ethLogo} style={{height: 50, width:50, resizeMode: "contain"}}/>
                         <Text style={{ color: "#fff", fontSize: 50}}>
@@ -81,11 +88,6 @@ export default function Wallet({route}) {
                     style={{ height: 200, width: 200, resizeMode: "contain", marginTop: 100, marginBottom:100 }}
                 />
             )}
-            <TouchableOpacity style={[styles.button,{marginTop: 0, marginBottom:50}]} onPress={() => {
-                navigation.navigate("Home")
-            }} >
-                <Text style={{ color: "#fff", fontSize: 24 }}>Back</Text>
-            </TouchableOpacity>
         </View>
     );
 }

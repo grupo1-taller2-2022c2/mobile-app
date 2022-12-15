@@ -8,10 +8,17 @@ import {
     Button,
 } from "react-native";
 import { styles } from "../../Styles";
+import {MaterialIcons} from "@expo/vector-icons";
 
 export default function DriverHome({ navigation }) {
     return (
         <View style={styles.container}>
+            <TouchableOpacity
+                onPress={() => navigation.openDrawer()}
+                style={{position: 'absolute', top: 40, left: 15, height:50, width:50}}
+            >
+                <MaterialIcons name="menu-open" size={50} color='white'/>
+            </TouchableOpacity>
             <Text
                 style={{ padding: 10, marginTop: 20, color: "#fff", marginBottom: 5 }}
             >

@@ -9,7 +9,16 @@ import {
 } from "react-native";
 import { styles } from "../../Styles";
 import { getUserStatus, getUserToken } from "../../UserContext";
-import { API_GATEWAY_PORT, DRIVER_ME_EP, HTTP_STATUS_UNAUTHORIZED,HTTP_STATUS_DOESNT_EXIST, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, GATEWAY_URL } from "../../Constants";
+import {
+    API_GATEWAY_PORT,
+    DRIVER_ME_EP,
+    HTTP_STATUS_UNAUTHORIZED,
+    HTTP_STATUS_DOESNT_EXIST,
+    SESSION_EXPIRED_MSG,
+    GENERIC_ERROR_MSG,
+    GATEWAY_URL,
+    UPDATE_LOCATION_EP
+} from "../../Constants";
 import {useIsFocused} from "@react-navigation/native";
 import {useEffect, useState} from "react";
 import {createDrawerNavigator, DrawerContentScrollView, DrawerItem, DrawerItemList} from "@react-navigation/drawer";
@@ -24,6 +33,15 @@ function tryGetMyProfile(token) {
   return axios.get(GATEWAY_URL + DRIVER_ME_EP, {
     headers: { Authorization: "Bearer " + token },
   });
+}
+
+function tryDeleteLocation(token) {
+    return axios.delete(
+        GATEWAY_URL + UPDATE_LOCATION_EP + '/',
+        {
+            headers: { Authorization: "Bearer " + token },
+        }
+    );
 }
 
 export default function DriverHome({ navigation }) {
@@ -56,15 +74,35 @@ export default function DriverHome({ navigation }) {
     }
 
     const stopSearchingTrips = () => {
-      return null;
+        token
+            .value()
+            .catch((e) => {
+                console.log("Token not found");
+                Alert.alert("Something went wrong!");
+                userStatus.signInState.signOut();
+            })
+            .then((token) => {
+                return tryDeleteLocation(token);
+            }).then(() => console.log("Location Deleted!"))
+            .catch((e) => {
+                if (e.response && e.response.status === HTTP_STATUS_DOESNT_EXIST) {
+                    return
+                }
+                console.log(e);
+                if (e.response) {
+                    console.log(e.response)
+                    console.log(e.response.message)
+                }
+                //FIXME: is this truly the only error case?
+                Alert.alert(SESSION_EXPIRED_MSG);
+                userStatus.signInState.signOut();
+            });
     }
 
 
     useEffect(() => {
         fetchProfile()
-        if (isFocused) {
-            stopSearchingTrips()
-        }
+        stopSearchingTrips()
     }, [isFocused]);
 
     return (

@@ -18,6 +18,7 @@ import {getUserStatus, getUserToken} from "../UserContext";
 import * as React from "react";
 import {NavigationContext} from "@react-navigation/native";
 import {SAVED_LOCATION} from "../Constants";
+import {MaterialIcons} from "@expo/vector-icons";
 
 function tryCreateLocation(locationName, locationStreet, locationAddr, userToken) {
     return axios.post(
@@ -82,8 +83,14 @@ export default function SavedLocations() {
 
     return (
         <View style={[styles.container, { minHeight: Math.round(windowHeight), alignItems: "center", justifyContent: "center"}]}>
-            <Text style={[styles.title, {marginTop:50, fontSize: 40}]}>Saved Locations</Text>
-            <View style={[styles.container, {width: "100%", marginTop:20, alignItems: "center", justifyContent: "center" }]}>
+            <TouchableOpacity
+                onPress={() => navigation.openDrawer()}
+                style={{position: 'absolute', top: 40, left: 15, height:50, width:50}}
+            >
+                <MaterialIcons name="menu-open" size={50} color='white'/>
+            </TouchableOpacity>
+            <Text style={[styles.title, {marginTop:100, fontSize: 40}]}>Saved Locations</Text>
+            <View style={[styles.container, {width: "100%", marginTop:5, marginBottom: 5, alignItems: "center", justifyContent: "center" }]}>
                 <View style={[styles.container, {width: "100%"}]}>
                     <Text style={styles.text}>
                         Enter a location you want to add!
@@ -128,7 +135,7 @@ export default function SavedLocations() {
                         <Text style={{color: "#fff", fontSize: 18}}>Create</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={{borderWidth: 2, borderRadius:40, borderColor: "grey", height: 300, width: 400,
+                <View style={{borderWidth: 2, borderRadius:40, marginBottom:40, borderColor: "grey", height: 300, width: 400,
                     alignItems: "center", justifyContent: "center"}}>
                     <View style={{ marginTop:50, marginBottom:50, alignItems: "center", justifyContent: "center", height: 250,
                         width: 330}}>
@@ -140,11 +147,6 @@ export default function SavedLocations() {
                     </View>
                 </View>
             </View>
-            <TouchableOpacity style={[styles.button,{marginTop: 10, marginBottom:50}]} onPress={() => {
-                navigation.navigate("Home")
-            }} >
-                <Text style={{ color: "#fff", fontSize: 24 }}>Back</Text>
-            </TouchableOpacity>
         </View>
     );
 }

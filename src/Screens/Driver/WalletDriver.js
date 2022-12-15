@@ -17,6 +17,7 @@ import {GATEWAY_URL, SIGNIN_EP, USERS_URI, WALLETS_URI, WALLET_WITHDRAWAL_URI} f
 import {getUserToken} from "../../UserContext";
 import * as React from "react";
 import {NavigationContext} from "@react-navigation/native";
+import {MaterialIcons} from "@expo/vector-icons";
 
 function tryWithdrawFunds(userEmail, externalWallet, amount, userToken) {
     return axios.post(
@@ -54,7 +55,13 @@ export default function WalletDriver({route}) {
     useEffect(refreshWallet, []);
     return (
         <View style={[styles.container, { minHeight: Math.round(windowHeight), alignItems: "center", justifyContent: "center"}]}>
-            <Text style={[styles.title, {marginTop:50, fontSize: 40}]}>Wallet Withdrawal</Text>
+            <TouchableOpacity
+                onPress={() => navigation.openDrawer()}
+                style={{position: 'absolute', top: 40, left: 15, height:50, width:50}}
+            >
+                <MaterialIcons name="menu-open" size={50} color='white'/>
+            </TouchableOpacity>
+            <Text style={[styles.title, {marginTop:100, fontSize: 40}]}>Wallet Withdrawal</Text>
             {walletInfo ? (
                 <View style={[styles.container, {width: "100%", marginTop:20, alignItems: "center", justifyContent: "center" }]}>
                     <View style={[styles.container, {width: "100%"}]}>
@@ -106,7 +113,7 @@ export default function WalletDriver({route}) {
                             <Text style={{color: "#fff", fontSize: 18}}>Withdraw</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={{ marginTop:50, marginBottom:50, alignItems: "center", justifyContent: "center", height: 300,
+                    <View style={{ marginTop:20, marginBottom:100, alignItems: "center", justifyContent: "center", height: 300,
                         width: 400, borderWidth: 2, borderRadius:40, borderColor: "grey" }}>
                         <Image source={ethLogo} style={{height: 50, width:50, resizeMode: "contain"}}/>
                         <Text style={{ color: "#fff", fontSize: 50}}>
@@ -128,11 +135,6 @@ export default function WalletDriver({route}) {
                     style={{ height: 200, width: 200, resizeMode: "contain", marginTop: 100, marginBottom:100 }}
                 />
             )}
-            <TouchableOpacity style={[styles.button,{marginTop: 10, marginBottom:50}]} onPress={() => {
-                navigation.navigate("DriverHome")
-            }} >
-                <Text style={{ color: "#fff", fontSize: 24 }}>Back</Text>
-            </TouchableOpacity>
         </View>
     );
 }

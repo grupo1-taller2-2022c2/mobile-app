@@ -14,6 +14,7 @@ import {GATEWAY_URL, DRIVER_ME_EP, SESSION_EXPIRED_MSG} from "../../Constants";
 import {getUserStatus, getUserToken} from "../../UserContext";
 import {useIsFocused} from "@react-navigation/native";
 import axios from "axios";
+import {MaterialIcons} from "@expo/vector-icons";
 
 function tryGetMyProfile(token) {
     return axios.get(GATEWAY_URL + DRIVER_ME_EP, {
@@ -56,6 +57,12 @@ function tryGetMyProfile(token) {
 
     return (
       <View style={styles.myProfile}>
+          <TouchableOpacity
+              onPress={() => navigation.openDrawer()}
+              style={{position: 'absolute', top: 40, left: 15, height:50, width:50}}
+          >
+              <MaterialIcons name="menu-open" size={50} color='white'/>
+          </TouchableOpacity>
           {data ?
               <>
         <Image source={{uri: data.photo + "?time=" + new Date()}} style={{height: 200, width:200, resizeMode: "contain"}}/>
@@ -71,11 +78,6 @@ function tryGetMyProfile(token) {
           }} >
               <Text style={{ color: "#fff", fontSize: 24 }}>Edit Profile</Text>
           </TouchableOpacity>
-        <TouchableOpacity style={[styles.button,{marginTop: 70}]} onPress={() => {
-          navigation.navigate("DriverHome")
-        }} >
-          <Text style={{ color: "#fff", fontSize: 24 }}>Back</Text>
-        </TouchableOpacity>
               </> : null}
       </View>
     );
