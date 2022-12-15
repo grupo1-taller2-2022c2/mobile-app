@@ -110,14 +110,14 @@ export default function Home({ navigation }) {
           />
           { myProfile ?
               <Drawer.Screen name="Profile" component={Profile}
-                             options={{headerShown: false, drawerIcon:() =>
+                             options={{headerShown: false, unmountOnBlur:true, drawerIcon:() =>
                                      <FontAwesome name="users" size={24} color="black"/>}}
                              initialParams={{data: myProfile}}
               />
               : null }
           {myProfile ?
               <Drawer.Screen name="Wallet" component={Wallet}
-                             options={{headerShown: false,  drawerIcon:() =>
+                             options={{headerShown: false, unmountOnBlur:true, drawerIcon:() =>
                                      <MaterialCommunityIcons name="ethereum" size={24} color="black"/>}}
                              initialParams={{data: myProfile}}
               />
