@@ -144,7 +144,7 @@ export default function DriverHome({ navigation }) {
                               )
                           }}>
             <Drawer.Screen name="Frontpage" component={DriverFrontpage}
-                           options={{headerShown: false, drawerIcon:() =>
+                           options={{headerShown: false, unmountOnBlur:true, drawerIcon:() =>
                                    <MaterialIcons name="house" size={24} color="black"/>
                            }}
             />
@@ -157,7 +157,7 @@ export default function DriverHome({ navigation }) {
                 : null }
             {myProfile ?
                 <Drawer.Screen name="Wallet" component={Wallet}
-                               options={{headerShown: false,  drawerIcon:() =>
+                               options={{headerShown: false, unmountOnBlur:true, drawerIcon:() =>
                                        <MaterialCommunityIcons name="ethereum" size={24} color="black"/>}}
                                initialParams={{data: myProfile}}
                 />

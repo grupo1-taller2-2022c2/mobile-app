@@ -104,7 +104,7 @@ export default function Home({ navigation }) {
                             )
                         }}>
           <Drawer.Screen name="Frontpage" component={Frontpage}
-                         options={{headerShown: false, drawerIcon:() =>
+                         options={{headerShown: false, unmountOnBlur:true, drawerIcon:() =>
                                  <MaterialIcons name="house" size={24} color="black"/>
                          }}
           />
