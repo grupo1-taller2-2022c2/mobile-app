@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import {EDIT_DRIVER_PROF_EP, GATEWAY_URL, SESSION_EXPIRED_MSG, UPLOAD_PIC_DRIVER} from "../../Constants";
 import {getUserStatus, getUserToken} from "../../UserContext";
+import {AntDesign, MaterialIcons} from "@expo/vector-icons";
 
 function tryEditProfile(name, surname, license, model, token) {
     return axios.patch(GATEWAY_URL + EDIT_DRIVER_PROF_EP, {
@@ -67,14 +68,11 @@ export default function DriverEditProfile({route, navigation}) {
 
     return (
         <View style={styles.container}>
-            <Text style={[styles.title, { fontSize: 15 }]}>
-                Please, enter your new profile information!
-            </Text>
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                {image && <Image source={{ uri: image.uri }} style={{ width: 200, height: 200, resizeMode: "contain"}} />}
-                {!image && <Image source={{uri: data.photo + "?time=" + new Date()}} style={{height: 200, width:200, resizeMode: "contain"}}/>}
-                <Text>{"\n"}</Text>
-                <Button title="Pick an image" onPress={pickImage} />
+                <TouchableOpacity onPress={pickImage}>
+                    {image && <Image source={{ uri: image.uri }} style={{ width: 200, height: 200, resizeMode: "contain", borderRadius:5}} />}
+                    {!image && <Image source={{uri: data.photo + "?time=" + new Date()}} style={{height: 200, width:200, resizeMode: "contain", borderRadius:5}}/>}
+                </TouchableOpacity>
             </View>
             <Text>{"\n"}</Text>
             <TextInput
@@ -144,21 +142,10 @@ export default function DriverEditProfile({route, navigation}) {
                 <Text style={styles.buttonText}>Update Profile</Text>
             </TouchableOpacity>
             <TouchableOpacity
-                style={[styles.button, { backgroundColor: "yellow" }]}
-                onPress={() => {
-                    //FIXME: delete this
-                    onChangeName("maticito");
-                    onChangeSurname("el crack");
-                    onChangeLicence("100gecs");
-                    onChangeModel("fitito");
-                }}
+                onPress={() => navigation.navigate("DriverHome")}
+                style={{position: 'absolute', top: 40, left: 15, height:50, width:50}}
             >
-                <Text style={styles.buttonText}>Fast Fill-in(dev)</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.button,{marginTop: 70}]} onPress={() => {
-                navigation.navigate("DriverHome")
-            }} >
-                <Text style={{ color: "#fff", fontSize: 24 }}>Back</Text>
+                <AntDesign name="back" size={50} color='white'/>
             </TouchableOpacity>
         </View>
     );

@@ -14,7 +14,8 @@ import {GATEWAY_URL, ME_EP, SESSION_EXPIRED_MSG} from "../Constants";
 import {useEffect, useState} from "react";
 import {getUserStatus, getUserToken} from "../UserContext";
 import {useIsFocused} from "@react-navigation/native";
-import {MaterialIcons} from "@expo/vector-icons";
+import {FontAwesome, MaterialIcons} from "@expo/vector-icons";
+import ProfileCard from "../components/ProfileCard"
 
 function tryGetMyProfile(token) {
     return axios.get(GATEWAY_URL + ME_EP, {
@@ -65,16 +66,11 @@ export default function MyProfile({route, navigation}) {
           </TouchableOpacity>
           {data ?
               <>
-          <Image source={{uri: data.photo + "?time=" + new Date()}} style={{height: 200, width:200, resizeMode: "contain"}}/>
-          <View style={{marginTop: 20}}>
-            <Text style={{ color: "#fff", fontSize: 24 }}>Email Address: {data.email}</Text>
-            <Text style={{ color: "#fff", fontSize: 24 }}>Name: {data.username} {data.surname}</Text>
-            <Text style={{ color: "#fff", fontSize: 24 }}>Rating: {data.ratings}/5</Text>
-          </View>
-          <TouchableOpacity style={[styles.button,{marginTop: 70}]} onPress={() => {
+          <ProfileCard data={{data}} isDriver={false}/>
+          <TouchableOpacity style={{position: 'absolute', top: 40, right: 15, height:50, width:50}} onPress={() => {
             navigation.navigate("EditProfile", {data: data});
           }}>
-              <Text style={{ color: "#fff", fontSize: 24 }}>Edit Profile</Text>
+              <FontAwesome name="edit" size={50} color='white' />
           </TouchableOpacity>
               </>  : null }
       </View>

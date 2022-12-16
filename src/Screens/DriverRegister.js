@@ -12,6 +12,7 @@ import {
   Button,
 } from "react-native";
 import { API_GATEWAY_PORT, ADD_VEHICLE_EP, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, HTTP_STATUS_VALID_ERROR, HTTP_STATUS_UNAUTHORIZED, GATEWAY_URL } from "../Constants";
+import {MaterialIcons} from "@expo/vector-icons";
 
 function alertWrongCredentials() {
   Alert.alert("Please enter valid vehicle credentials!");
@@ -35,9 +36,12 @@ export default function DriverRegister(props) {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { fontSize: 20 }]}>
-        Please, enter your vehicle details:
-      </Text>
+        <TouchableOpacity
+            onPress={() => props.navigation.openDrawer()}
+            style={{position: 'absolute', top: 40, left: 15, height:50, width:50}}
+        >
+            <MaterialIcons name="menu-open" size={50} color='white'/>
+        </TouchableOpacity>
       <TextInput
         style={styles.input}
         onChangeText={onChangeLicencePlate}
@@ -74,10 +78,10 @@ export default function DriverRegister(props) {
             .catch((e) => {
               const status_code = e.response.status;
               console.log("catch: " + e);
-              if (status_code == HTTP_STATUS_VALID_ERROR) {
+              if (status_code === HTTP_STATUS_VALID_ERROR) {
                 alertWrongCredentials();
               }
-              else if (status_code == HTTP_STATUS_UNAUTHORIZED){
+              else if (status_code === HTTP_STATUS_UNAUTHORIZED){
                 Alert.alert(SESSION_EXPIRED_MSG);
                 userStatus.signInState.signOut();
               }

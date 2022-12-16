@@ -14,7 +14,8 @@ import {GATEWAY_URL, DRIVER_ME_EP, SESSION_EXPIRED_MSG} from "../../Constants";
 import {getUserStatus, getUserToken} from "../../UserContext";
 import {useIsFocused} from "@react-navigation/native";
 import axios from "axios";
-import {MaterialIcons} from "@expo/vector-icons";
+import {FontAwesome, MaterialIcons} from "@expo/vector-icons";
+import ProfileCard from "../../components/ProfileCard"
 
 function tryGetMyProfile(token) {
     return axios.get(GATEWAY_URL + DRIVER_ME_EP, {
@@ -65,19 +66,12 @@ function tryGetMyProfile(token) {
           </TouchableOpacity>
           {data ?
               <>
-        <Image source={{uri: data.photo + "?time=" + new Date()}} style={{height: 200, width:200, resizeMode: "contain"}}/>
-        <View style={{marginTop: 20}}>
-        <Text style={{ color: "#fff", fontSize: 24 }}>Email Address: {data.email}</Text>
-        <Text style={{ color: "#fff", fontSize: 24 }}>Name: {data.username} {data.surname}</Text>
-        <Text style={{ color: "#fff", fontSize: 24 }}>Rating: {data.ratings}/5</Text>
-        <Text style={{ color: "#fff", fontSize: 24 }}>License Plate: {data.licence_plate}</Text>
-        <Text style={{ color: "#fff", fontSize: 24 }}>Vehicle Model: {data.model}</Text>
-        </View>
-          <TouchableOpacity style={[styles.button,{marginTop: 70}]} onPress={() => {
-              navigation.navigate("DriverEditProfile", {data: data});
-          }} >
-              <Text style={{ color: "#fff", fontSize: 24 }}>Edit Profile</Text>
-          </TouchableOpacity>
+                  <ProfileCard data={{data}} isDriver={true}/>
+                  <TouchableOpacity style={{position: 'absolute', top: 40, right: 15, height:50, width:50}} onPress={() => {
+                      navigation.navigate("DriverEditProfile", {data: data});
+                  }}>
+                      <FontAwesome name="edit" size={50} color='white' />
+                  </TouchableOpacity>
               </> : null}
       </View>
     );
