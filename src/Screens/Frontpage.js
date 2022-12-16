@@ -88,6 +88,9 @@ export default function Frontpage({ navigation }) {
 
     const renderHistory = (drive) => {
         console.log(drive.item)
+        if (drive.item.state !== 'Completed' && drive.item.state !== 'Denied') {
+            return null
+        }
         return <HistoryItem
             source={drive.item.src_address + " " + drive.item.src_number}
             destiny={drive.item.dst_address + " " + drive.item.dst_number}
