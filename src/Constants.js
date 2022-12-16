@@ -46,4 +46,5 @@ export const ACCEPT_TRIP = "Accept";
 export const FINALIZE_TRIP = "Finalize";
 
 const localhost = Constants.manifest.extra.localhost;
-export const GATEWAY_URL = "http://" + localhost + ":" + API_GATEWAY_PORT;
+//export const GATEWAY_URL = "http://" + localhost + ":" + API_GATEWAY_PORT;
+export const GATEWAY_URL = "https://fi-uber-api-gateway.herokuapp.com"
