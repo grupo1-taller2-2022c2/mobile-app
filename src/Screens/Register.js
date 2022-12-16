@@ -102,19 +102,6 @@ export default function Register(props) {
       >
         <Text style={styles.buttonText}>Sign up</Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: "yellow" }]}
-        onPress={() => {
-          //FIXME: delete this
-          onChangeEmail("m@gmail.com");
-          onChangePassword("a");
-          onChangePassRepeat("a");
-          onChangeName("matias");
-          onChangeSurname("fusco");
-        }}
-      >
-        <Text style={styles.buttonText}>Fast Fill-in(dev)</Text>
-      </TouchableOpacity>
     </View>
   );
 }

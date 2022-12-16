@@ -9,7 +9,7 @@ import {
     TextInput,
     Alert,
     TouchableOpacity,
-    Button, Platform,
+    Button, Platform, Image,
 } from "react-native";
 import { getUserStatus, getUserToken } from "../UserContext";
 import { auth } from "../firebase";
@@ -17,6 +17,8 @@ import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import * as Notifications from "expo-notifications";
+import GoogleIcon from "../../assets/google.jpg";
+import FiuberLogo from "../../assets/fiuberLogo.png";
 
 function alertWrongCredentials() {
   Alert.alert("Wrong Credentials!");
@@ -130,10 +132,9 @@ export default function Login({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to FI-UBER</Text>
-      <Text style={styles.text}>
-        Please enter your email address and password
-      </Text>
+        <View style={{alignItems: 'center'}}>
+        <Image source={FiuberLogo} style={{marginTop: 10, height: 300, width:300, resizeMode: "contain", borderRadius:15}}/>
+        </View>
       <TextInput
         style={styles.input}
         onChangeText={onChangeEmail}
@@ -180,39 +181,31 @@ export default function Login({ navigation }) {
         <Text style={styles.buttonText}>Sign in</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-            promptAsync() 
-            .then((response) => {
-              console.log("Got response at Sign In with Google!")
-              // Ya seteamos el token en el useEffect y logueamos si todo es exitoso
-            })
-            .catch((e) => {
-              console.log("Could not Sign In with Google")
-              alertWrongCredentials();
-            });
-        }}
-      >
-        <Text style={styles.buttonText}>Sign in with Google</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: "dodgerblue" }]}
         onPress={() => {
           navigation.navigate("Register");
         }}
       >
-        <Text style={styles.buttonText}>Sign up</Text>
+          <View style={{alignItems: 'center', borderBottomWidth:1, borderBottomColor:'grey'}}>
+        <Text style={{color: 'white', fontSize:20}}>No account? Try signing up!{'\n'}</Text>
+          </View>
       </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: "yellow" }]}
-        onPress={() => {
-          //FIXME: delete this
-          onChangeEmail("m@gmail.com");
-          onChangePassword("a");
-        }}
-      >
-        <Text style={styles.buttonText}>Fast Fill-in(dev)</Text>
-      </TouchableOpacity>
+        <View style={{alignItems: 'center'}}>
+            <TouchableOpacity
+                onPress={() => {
+                    promptAsync()
+                        .then((response) => {
+                            console.log("Got response at Sign In with Google!")
+                            // Ya seteamos el token en el useEffect y logueamos si todo es exitoso
+                        })
+                        .catch((e) => {
+                            console.log("Could not Sign In with Google")
+                            alertWrongCredentials();
+                        });
+                }}
+            >
+                <Image source={GoogleIcon} style={{marginTop: 10, height: 100, width:100, resizeMode: "contain", borderRadius:15}}/>
+            </TouchableOpacity>
+        </View>
     </View>
   );
 }
