@@ -56,11 +56,6 @@ export default function WaitingForDriver({ route }) {
               [{text: "Return to Menu"}]);
           navigation.navigate("Home");
         }
-        //else if (response.data.state === "In course" ||
-        //    response.data.state === "Completed") {
-        //  navigation.replace("WaitingForTripToEnd", { data: response.data, asignedDriver: driver,
-        //    sourceCoords: sourceCoords, destinationCoords: destinationCoords });
-        //}
       }
     } catch (error) {
       console.log(error);
@@ -90,19 +85,9 @@ export default function WaitingForDriver({ route }) {
         </Text>
       ) : (
         <Text style={[styles.text, { margin: 30, fontSize: 30 }]}>
-          Waiting for Driver response
+          Waiting for Driver response...
         </Text>
       )}
-      <Text style={[styles.text, { margin: 30, fontSize: 20 }]}>
-        {driver.username} {driver.surname} is your assigned Driver
-      </Text>
-      <Text style={[styles.text, { margin: 30, fontSize: 20 }]}>
-        And they are driving a {driver.model}, with license plate{" "}
-        {driver.licence_plate}
-      </Text>
-      <Text style={[styles.text, { margin: 30, fontSize: 20 }]}>
-        Rating for this driver is: {driver.ratings}/5
-      </Text>
     </View>
   );
 }

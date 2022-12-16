@@ -18,6 +18,7 @@ import {getUserStatus, getUserToken} from "../UserContext";
 import * as React from "react";
 import {NavigationContext} from "@react-navigation/native";
 import {SAVED_LOCATION} from "../Constants";
+import {MaterialIcons} from "@expo/vector-icons";
 
 function tryCreateLocation(locationName, locationStreet, locationAddr, userToken) {
     return axios.post(
@@ -32,10 +33,19 @@ function tryCreateLocation(locationName, locationStreet, locationAddr, userToken
 }
 
 const LocationItem = ({locationName, locationStreet, locationAddr}) => (
-    <View style={{backgroundColor: 'red', width: '100%', marginTop:20}}>
-        <Text style={{fontSize: 20}}>
-            {locationName} ===> {locationStreet} {locationAddr}
-        </Text>
+    <View style={{backgroundColor: '#e6e7e8', width: '100%', marginTop:20, flex: 1, borderStyle:'solid', borderRadius:20,
+    flexDirection: 'row', flexWrap:'wrap', alignItems:'flex-start', justifyContent: 'center'}}>
+        <View style={{width:`50%`, backgroundColor: '#cadcfa', alignItems:'center',
+            justifyContent: 'center', height:'100%', borderRadius:20, borderStyle:'solid'}}>
+            <Text style={{fontSize: 20, fontWeight: 'bold'}}>
+                {locationName}
+            </Text>
+        </View>
+        <View style={{width:`50%`}}>
+            <Text style={{fontSize: 20, marginLeft:10, color:'#525151'}}>
+                {locationStreet}{'\n'}{locationAddr}
+            </Text>
+        </View>
     </View>
 )
 
@@ -82,8 +92,14 @@ export default function SavedLocations() {
 
     return (
         <View style={[styles.container, { minHeight: Math.round(windowHeight), alignItems: "center", justifyContent: "center"}]}>
-            <Text style={[styles.title, {marginTop:50, fontSize: 40}]}>Saved Locations</Text>
-            <View style={[styles.container, {width: "100%", marginTop:20, alignItems: "center", justifyContent: "center" }]}>
+            <TouchableOpacity
+                onPress={() => navigation.openDrawer()}
+                style={{position: 'absolute', top: 40, left: 15, height:50, width:50}}
+            >
+                <MaterialIcons name="menu-open" size={50} color='white'/>
+            </TouchableOpacity>
+            <Text style={[styles.title, {marginTop:100, fontSize: 40}]}>Saved Locations</Text>
+            <View style={[styles.container, {width: "100%", marginTop:5, marginBottom: 5, alignItems: "center", justifyContent: "center" }]}>
                 <View style={[styles.container, {width: "100%"}]}>
                     <Text style={styles.text}>
                         Enter a location you want to add!
@@ -128,23 +144,21 @@ export default function SavedLocations() {
                         <Text style={{color: "#fff", fontSize: 18}}>Create</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={{borderWidth: 2, borderRadius:40, borderColor: "grey", height: 300, width: 400,
+                <View style={{borderWidth: 2, borderRadius:40, marginBottom:40, borderColor: "grey", height: 300, width: 400,
                     alignItems: "center", justifyContent: "center"}}>
                     <View style={{ marginTop:50, marginBottom:50, alignItems: "center", justifyContent: "center", height: 250,
                         width: 330}}>
                         <FlatList
                             data={savedLocations}
                             renderItem={renderLocation}
+                            ListEmptyComponent={
+                            <Text style={{color: 'grey'}}>You don't have any saved locations yet!</Text>
+                            }
                             keyExtractor={item => item.id}
                         />
                     </View>
                 </View>
             </View>
-            <TouchableOpacity style={[styles.button,{marginTop: 10, marginBottom:50}]} onPress={() => {
-                navigation.navigate("Home")
-            }} >
-                <Text style={{ color: "#fff", fontSize: 24 }}>Back</Text>
-            </TouchableOpacity>
         </View>
     );
 }

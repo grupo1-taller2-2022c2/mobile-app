@@ -260,14 +260,6 @@ function SearchTab() {
         >
           <Text style={map_styles.buttonText}>Go!</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[map_styles.button, { backgroundColor: "yellow" }]}
-          onPress={() => {
-            onChangeDestinationInput("Plaza de mayo");
-          }}
-        >
-          <Text style={map_styles.buttonText}>FF(dev)</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -417,7 +409,7 @@ function MyMapView() {
                     }
                     /*navigation.navigate("WaitingForDriver", {
                       assignedDriver: assignedDriver,
-                    })*/ 
+                    })*/
                     setAssignedDriver(assignedDriver);
                     setIncomingNavigation(true);
                     setIsProcessingTrip(false);

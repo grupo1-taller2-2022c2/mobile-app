@@ -26,6 +26,7 @@ import {NavigationContext} from "@react-navigation/native";
 import MapView from "react-native-maps";
 import {map_styles, modal_styles} from "../MapStyles";
 import MapViewDirections from "react-native-maps-directions";
+import ProfileCard from "../components/ProfileCard"
 
 
 const { width, height } = Dimensions.get("window");
@@ -240,33 +241,14 @@ export default function WaitingForTripToEnd({ route }) {
                     }}
                 >
                     <View style={modal_styles.centeredView}>
-                        <View style={modal_styles.modalView}>
+                        <View style={[modal_styles.modalView, {alignItems:'center'}]}>
                             <Text style={[modal_styles.modalText, {fontSize: 25, fontWeight: "bold"}]}>
                                 Meet your Driver!
                             </Text>
-                            <Image
-                                source={driver.photo ? {uri: driver.photo} : passengerMarker}
-                                style={
-                                    {height:250, width:250}
-                                }
-                            />
-                            <Text style={[modal_styles.modalText, {marginTop: 20}]}>
-                                Name: {driver.username}
-                            </Text>
-                            <Text style={modal_styles.modalText}>
-                                Surname: {driver.surname}
-                            </Text>
-                            <Text style={modal_styles.modalText}>
-                                Licence plate: {driver.licence_plate}
-                            </Text>
-                            <Text style={modal_styles.modalText}>
-                                Model: {driver.model}
-                            </Text>
-                            <Text style={modal_styles.modalText}>
-                                Rating: {driver.ratings}
-                            </Text>
+                            <ProfileCard data={{data: driver}} isDriver={true} modal={true} notUpdate={true}/>
                             <Pressable
                                 style={({pressed}) => [modal_styles.button,
+                                    {marginTop:20, margin:'auto'},
                                     pressed? modal_styles.buttonPressed : modal_styles.buttonNoPress]}
                                 onPress={() => {
                                     setProfileModalVisible(!profileModalVisible);

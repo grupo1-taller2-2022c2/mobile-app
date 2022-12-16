@@ -45,18 +45,8 @@ export function NavigationStack() {
               options={{ headerShown: false }}
             />
             <Stack.Screen
-              name="DriverMyProfile"
-              component={DriverMyProfile}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
                 name="DriverEditProfile"
                 component={DriverEditProfile}
-                options={{ headerShown: false }}
-            />
-            <Stack.Screen
-                name="WalletDriver"
-                component={WalletDriver}
                 options={{ headerShown: false }}
             />
             <Stack.Screen
@@ -93,11 +83,6 @@ export function NavigationStack() {
               options={{ headerShown: false }}
             />
             <Stack.Screen
-              name="MyProfile"
-              component={MyProfile}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
                 name="EditProfile"
                 component={EditProfile}
                 options={{ headerShown: false }}
@@ -120,21 +105,6 @@ export function NavigationStack() {
             <Stack.Screen
                 name="RateTrip"
                 component={RateTrip}
-                options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="DriverRegistration"
-              component={DriverRegister}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-                name="Wallet"
-                component={Wallet}
-                options={{ headerShown: false }}
-            />
-            <Stack.Screen
-                name="SavedLocations"
-                component={SavedLocations}
                 options={{ headerShown: false }}
             />
           </>

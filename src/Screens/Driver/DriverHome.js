@@ -1,15 +1,33 @@
 import axios from "axios";
 import {
-  Text,
-  View,
-  TextInput,
-  Alert,
-  TouchableOpacity,
-  Button,
+    Text,
+    View,
+    TextInput,
+    Alert,
+    TouchableOpacity,
+    Button, Image,
 } from "react-native";
 import { styles } from "../../Styles";
 import { getUserStatus, getUserToken } from "../../UserContext";
-import { API_GATEWAY_PORT, DRIVER_ME_EP, HTTP_STATUS_UNAUTHORIZED,HTTP_STATUS_DOESNT_EXIST, SESSION_EXPIRED_MSG, GENERIC_ERROR_MSG, GATEWAY_URL } from "../../Constants";
+import {
+    API_GATEWAY_PORT,
+    DRIVER_ME_EP,
+    HTTP_STATUS_UNAUTHORIZED,
+    HTTP_STATUS_DOESNT_EXIST,
+    SESSION_EXPIRED_MSG,
+    GENERIC_ERROR_MSG,
+    GATEWAY_URL,
+    UPDATE_LOCATION_EP
+} from "../../Constants";
+import {useIsFocused} from "@react-navigation/native";
+import {useEffect, useState} from "react";
+import {createDrawerNavigator, DrawerContentScrollView, DrawerItem, DrawerItemList} from "@react-navigation/drawer";
+import {FontAwesome, MaterialCommunityIcons, MaterialIcons} from "@expo/vector-icons";
+import DriverFrontpage from "./DriverFrontpage";
+import Profile from "./DriverMyProfile";
+import Wallet from "./WalletDriver";
+
+const Drawer = createDrawerNavigator();
 
 function tryGetMyProfile(token) {
   return axios.get(GATEWAY_URL + DRIVER_ME_EP, {
@@ -17,114 +35,133 @@ function tryGetMyProfile(token) {
   });
 }
 
+function tryDeleteLocation(token) {
+    return axios.delete(
+        GATEWAY_URL + UPDATE_LOCATION_EP + '/',
+        {
+            headers: { Authorization: "Bearer " + token },
+        }
+    );
+}
+
 export default function DriverHome({ navigation }) {
   const userStatus = getUserStatus();
   const token = getUserToken();
-  return (
-    <View style={styles.container}>
-      <Text
-        style={{ padding: 10, marginTop: 20, color: "#fff", marginBottom: 5 }}
-      >
-        You have succesfully logged in as a Driver! {"\n"}
-        We will let you know when a passenger requests a ride!
-      </Text>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          userStatus.signInState.signOut();
-        }}
-      >
-        <Text style={styles.buttonText}>Log out</Text>
-      </TouchableOpacity>
+  const isFocused = useIsFocused();
+  const [myProfile, setMyProfile] = useState(null);
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          token
-            .value()
-            .catch((e) => {
+  const fetchProfile = () => {
+      token
+          .value()
+          .catch((e) => {
               console.log("Token not found");
               Alert.alert("Something went wrong!");
               userStatus.signInState.signOut();
+          })
+          .then((token) => {
+              return tryGetMyProfile(token);
+          })
+          .then((response) => {
+              setMyProfile(response.data);
+          })
+          .catch((e) => {
+              console.log(e);
+              //FIXME: is this truly the only error case?
+              Alert.alert(SESSION_EXPIRED_MSG);
+              userStatus.signInState.signOut();
+          });
+    }
+
+    const stopSearchingTrips = () => {
+        token
+            .value()
+            .catch((e) => {
+                console.log("Token not found");
+                Alert.alert("Something went wrong!");
+                userStatus.signInState.signOut();
             })
             .then((token) => {
-              return tryGetMyProfile(token);
-            })
-            .then((response) => {
-              navigation.navigate("DriverMyProfile", { data: response.data });
-            })
+                return tryDeleteLocation(token);
+            }).then(() => console.log("Location Deleted!"))
             .catch((e) => {
-              const status_code = e.response.status;
-              console.log(e);
-              if (status_code == HTTP_STATUS_DOESNT_EXIST) 
-              //FIXME: Maybe unreachable
-              {Alert.alert("You are not registered as a driver");}
-              else if (status_code == HTTP_STATUS_UNAUTHORIZED)  {
+                if (e.response && e.response.status === HTTP_STATUS_DOESNT_EXIST) {
+                    return
+                }
+                console.log(e);
+                if (e.response) {
+                    console.log(e.response)
+                    console.log(e.response.message)
+                }
+                //FIXME: is this truly the only error case?
                 Alert.alert(SESSION_EXPIRED_MSG);
                 userStatus.signInState.signOut();
-              }
-              else {
-                Alert.alert(GENERIC_ERROR_MSG);
-                userStatus.signInState.signOut();
-              }
             });
-        }}
-      >
-        <Text style={styles.buttonText}>My Profile</Text>
-      </TouchableOpacity>
-        <TouchableOpacity // Esto es horrible. Despues le metemos un useState con el profile o algo asi
-            style={styles.button}
-            onPress={() => {
-                token
-                    .value()
-                    .catch((e) => {
-                        console.log("Token not found");
-                        Alert.alert("Something went wrong!");
-                        userStatus.signInState.signOut();
-                    })
-                    .then((token) => {
-                        return tryGetMyProfile(token);
-                    })
-                    .then((response) => {
-                        navigation.navigate("WalletDriver", { data: response.data });
-                    })
-                    .catch((e) => {
-                        console.log(e);
-                        //FIXME: is this truly the only error case?
-                        Alert.alert(SESSION_EXPIRED_MSG);
-                        userStatus.signInState.signOut();
-                    });
-            }}
-        >
-            <Text style={styles.buttonText}>See or Withdraw funds</Text>
-        </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          navigation.navigate("WaitingForTrip");
-        }}
-      >
-        <Text style={styles.buttonText}>Start Driving!</Text>
-      </TouchableOpacity>
+    }
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          userStatus.driverMode.exit()
-        }}
-      >
-        <Text style={styles.buttonText}>Switch to Passenger mode</Text>
-      </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.button, {backgroundColor:"yellow"}]}
-        onPress={() => {
-          navigation.navigate("DriverRating", {data: {passenger: {username: "John", surname: "Doe", ratings: 4.5}, trip_id: 1}});
-        }}
-      >
-        <Text style={styles.buttonText}>Check out Rating Screen (dev)</Text>
-      </TouchableOpacity>
-    </View>
-  );
+    useEffect(() => {
+        fetchProfile()
+        stopSearchingTrips()
+    }, [isFocused]);
+
+    return (
+        <Drawer.Navigator useLegacyImplementation
+                          drawerType="front"
+                          initialRouteName="Profile"
+                          screenOptions={{
+                              activeTintColor: '#e91e63',
+                              itemStyle: { marginVertical: 10 },
+                          }}
+                          drawerContent={props => {
+                              return (
+                                  <DrawerContentScrollView {...props}>
+                                      <View style={{borderBottomColor: 'grey', borderBottomWidth: 1,
+                                          height: 100}}>
+                                          {myProfile ?
+                                              <Image source={{uri: myProfile.photo + "?time=" + new Date()}}
+                                                     style={{height: 60, width:60, resizeMode: "contain", borderColor: "grey",
+                                                         position: 'absolute', borderWidth:2, top: 20, left:20}} />
+                                              : null}
+                                          {myProfile ?
+                                              <View style={{height: 60, width:200, position: 'absolute',
+                                                  top: 20, right:10, left: 100}}>
+                                                  <Text style={{fontWeight: 'bold', fontSize: 20}}>
+                                                      {myProfile.username} {myProfile.surname}
+                                                  </Text>
+                                                  <Text style={{fontSize: 14}}>
+                                                      {myProfile.email}
+                                                  </Text>
+                                              </View>
+                                              : null}
+                                      </View>
+                                      <DrawerItemList {...props} />
+                                      <DrawerItem label="Switch to Passenger" onPress={() => userStatus.driverMode.exit()}
+                                                  icon={() => <MaterialCommunityIcons name="seat-passenger" size={20} color="black"/>}/>
+                                      <DrawerItem label="Log Out" onPress={() => userStatus.signInState.signOut()}
+                                                  icon={() => <MaterialIcons name="logout" size={24} color="black"/>}/>
+                                  </DrawerContentScrollView>
+                              )
+                          }}>
+            <Drawer.Screen name="Frontpage" component={DriverFrontpage}
+                           options={{headerShown: false, unmountOnBlur:true, drawerIcon:() =>
+                                   <MaterialIcons name="house" size={24} color="black"/>
+                           }}
+            />
+            { myProfile ?
+                <Drawer.Screen name="Profile" component={Profile}
+                               options={{headerShown: false, drawerIcon:() =>
+                                       <FontAwesome name="users" size={24} color="black"/>}}
+                               initialParams={{data: myProfile}}
+                />
+                : null }
+            {myProfile ?
+                <Drawer.Screen name="Wallet" component={Wallet}
+                               options={{headerShown: false, unmountOnBlur:true, drawerIcon:() =>
+                                       <MaterialCommunityIcons name="ethereum" size={24} color="black"/>}}
+                               initialParams={{data: myProfile}}
+                />
+                : null }
+        </Drawer.Navigator>
+    );
 }
