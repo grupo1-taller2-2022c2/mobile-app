@@ -15,7 +15,7 @@ import { NavigationContext } from "@react-navigation/native";
 import { styles } from "../../Styles";
 import StarRating from "react-native-star-rating-widget";
 import axios from "axios";
-import {GATEWAY_URL, PASSENGER_RATE_EP} from '../../Constants'
+import { GATEWAY_URL, PASSENGER_RATE_EP } from "../../Constants";
 import { tryDeleteDriverLastLocation } from "../Utils";
 
 function tryRatePassenger(token, passenger_email, trip_id, rating, message) {
@@ -25,7 +25,7 @@ function tryRatePassenger(token, passenger_email, trip_id, rating, message) {
       passenger_email: passenger_email,
       trip_id: trip_id,
       ratings: rating,
-      message: message
+      message: message,
     },
     { headers: { Authorization: "Bearer " + token } }
   );
@@ -38,6 +38,7 @@ export default function DriverRating({ route }) {
   const token = getUserToken();
   const navigation = React.useContext(NavigationContext);
   const [rating, setRating] = useState(0);
+  const [message, setMessage] = useState(0);
 
   return (
     <View style={styles.container}>
@@ -49,6 +50,16 @@ export default function DriverRating({ route }) {
       <View style={{ alignItems: "center" }}>
         <StarRating rating={rating} onChange={setRating} starSize={64} />
       </View>
+      <Text style={[styles.text, { fontSize: 18, marginTop: 15 }]}>
+        If you want, write a review!
+      </Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={setMessage}
+        value={message}
+        placeholder="Write your opinion here! (50 characters max)"
+        height={70}
+      />
       <TouchableOpacity
         style={[
           styles.button,
@@ -59,28 +70,36 @@ export default function DriverRating({ route }) {
           },
         ]}
         onPress={async () => {
-            try{
-                console.log(passenger)
-                let userToken = await token.value()
-                let response = await tryRatePassenger(userToken, passenger.email, trip_id, rating, "No message")
-                Alert.alert(
-                    "Rating submitted!",
-                    "You gave " +
-                      passenger.username +
-                      " " +
-                      passenger.surname +
-                      " " +
-                      rating +
-                      " stars!"
-                  );
-                await tryDeleteDriverLastLocation(userToken)
-                navigation.navigate("DriverHome");
+          try {
+            console.log(passenger);
+            let userToken = await token.value();
+            let response = await tryRatePassenger(
+              userToken,
+              passenger.email,
+              trip_id,
+              rating,
+              message
+            );
+            Alert.alert(
+              "Rating submitted!",
+              "You gave " +
+                passenger.username +
+                " " +
+                passenger.surname +
+                " " +
+                rating +
+                " stars!"
+            );
+            await tryDeleteDriverLastLocation(userToken);
+            navigation.navigate("DriverHome");
+          } catch (e) {
+            console.log(e);
+            if (message.length > 50) {
+              Alert.alert("Error", "Message too long! (50 characters max)");
+              return;
             }
-            catch(e){
-                console.log(e)
-                Alert.alert("Error", "Unable to process rating")
-            }
-          
+            Alert.alert("Error", "Unable to process rating");
+          }
         }}
       >
         <Text style={[styles.buttonText, { fontSize: 24, color: "#FFF" }]}>
