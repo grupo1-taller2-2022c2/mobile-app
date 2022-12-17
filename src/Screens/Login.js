@@ -83,6 +83,14 @@ export default function Login({ navigation }) {
     },
   );
   const registerForPushNotificationsAsync = async () => {
+      if (Platform.OS === 'android') {
+          await Notifications.setNotificationChannelAsync('default', {
+              name: 'default',
+              importance: Notifications.AndroidImportance.MAX,
+              vibrationPattern: [0, 250, 250, 250],
+              lightColor: '#FF231F7C',
+          });
+      }
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
       if (existingStatus !== 'granted') {
@@ -96,16 +104,6 @@ export default function Login({ navigation }) {
       const expoToken = (await Notifications.getExpoPushTokenAsync()).data;
       console.log("NOTIFICATION TOKEN: ", expoToken);
       console.log("TYPE OF: ", typeof expoToken);
-
-      if (Platform.OS === 'android') {
-          Notifications.setNotificationChannelAsync('default', {
-              name: 'default',
-              importance: Notifications.AndroidImportance.MAX,
-              vibrationPattern: [0, 250, 250, 250],
-              lightColor: '#FF231F7C',
-          });
-      }
-
       return expoToken;
   };
 
